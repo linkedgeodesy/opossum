@@ -1,5 +1,7 @@
 # opossum
 
+Opossum OOO Web App
+
 ## Setup
 
 Run `git clone https://github.com/linkedgeodesy/opossum.git` to create a local copy of this repository.
