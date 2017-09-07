@@ -53,7 +53,9 @@ module.exports = {
         // makes jquery globally available for legacy libraries that depend on it being available globally
         new webpack.ProvidePlugin({
             $: "jquery",
-            jQuery: "jquery"
+            jQuery: "jquery",
+            L: "leaflet",
+            leaflet: "leaflet"
         })
     ]
 
