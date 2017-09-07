@@ -2,6 +2,10 @@
 
 Opossum OOO Web App
 
+## Demo
+
+Demo at http://opossum.linkedgeodesy.org
+
 ## Setup
 
 Run `git clone https://github.com/linkedgeodesy/opossum.git` to create a local copy of this repository.
