@@ -1,0 +1,44 @@
+{
+  "name": "foobar-webapp",
+  "version": "0.0.1",
+  "description": "Dummy for Frontend Applications using Node.js, webpack and ESLint.",
+  "main": "index.html",
+  "scripts": {
+    "start": "npm run watch",
+    "watch": "concurrently -k --names \"webpack,ctx\" --prefix-colors \"cyan.bold,yellow.bold\" \"npm run watch-js\" \"npm run watch-static\"",
+    "watch-static": "cpx \"src/**/*.{html,json,png}\" dist --watch --verbose",
+    "watch-js": "webpack-dev-server",
+    "build": "npm run build-static && npm run build-js",
+    "build-static": "cpx \"src/**/*.{html,json,png}\" dist",
+    "build-js": "webpack"
+  },
+  "keywords": [],
+  "author": "Florian Thiery, Axel Kunz",
+  "license": "MIT",
+  "repository": "https://github.com/RGZM/foobar-webapp",
+  "homepage": "https://github.com/RGZM/foobar-webapp",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "d3": "^4.10.0",
+    "highcharts": "^5.0.12",
+    "jquery": "^3.2.1",
+    "jquery-ui": "^1.12.1",
+    "jstree": "^3.3.4",
+    "leaflet": "^1.1.0",
+    "lightbox": "^0.5.0",
+    "materialize-css": "^0.100.1",
+    "tablesorter": "^2.28.15"
+  },
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "concurrently": "^3.5.0",
+    "cpx": "^1.5.0",
+    "css-loader": "^0.28.4",
+    "eslint": "^4.2.0",
+    "less": "^2.7.2",
+    "style-loader": "^0.18.2",
+    "webpack": "^3.3.0",
+    "webpack-dev-server": "^2.5.1"
+  }
+}
