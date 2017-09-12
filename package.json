@@ -7,7 +7,7 @@
     "start": "npm run watch",
     "watch": "concurrently -k --names \"webpack,ctx\" --prefix-colors \"cyan.bold,yellow.bold\" \"npm run watch-js\" \"npm run watch-static\"",
     "watch-static": "cpx \"src/**/*.{html,json,png}\" dist --watch --verbose",
-    "watch-js": "webpack-dev-server",
+    "watch-js": "webpack-dev-server --open",
     "build": "npm run build-static && npm run build-js",
     "build-static": "cpx \"src/**/*.{html,json,png}\" dist",
     "build-js": "webpack"
