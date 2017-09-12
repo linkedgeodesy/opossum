@@ -2,20 +2,25 @@ import "./style/style.css";
 import * as $ from "jquery";
 import * as L from "leaflet";
 
-// init map
-var mymap = L.map("mapid").setView([39.4699075, -0.3762881000000107], 12);
 // set tile layer
-L.tileLayer("http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+var hotMap = L.tileLayer("http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: "&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>, Tiles courtesy of <a href='http://hot.openstreetmap.org/' target='_blank'>Humanitarian OpenStreetMap Team</a>"
-}).addTo(mymap);
+});//.addTo(baseMaps);
+
+var osmMap = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> Contributors'
+})
+
 // add circle
-L.circle([39.4699075, -0.3762881000000107], {
+var kreis_circ = L.circle([39.4699075, -0.3762881000000107], {
     color: "red",
     fillColor: "#f03",
     fillOpacity: 0.5,
     radius: 10000
-}).addTo(mymap);
+});//.addTo(overlayMaps);
+
 // read valencia data from wikipedia api
 $.ajax({
     type: "GET",
@@ -31,3 +36,28 @@ $.ajax({
         }
     }
 });
+
+// init map
+var mymap = L.map('mapid', {
+  center: [39.4699075, -0.3762881000000107],
+  zoom: 12,
+  layers: [hotMap, kreis_circ]//, wikiData]
+});
+
+var baseMaps = {
+  "Hot": hotMap,
+  "OSM Mapnik": osmMap
+}
+
+var overlays ={
+  "Kreis": kreis_circ
+  //"Wikipedia": wikiData
+}
+//var overlayMaps = L.layerGroup().addTo(mymap);
+
+/*
+console.log(overlayMaps);
+console.log(overlayMaps._layers);
+console.log(wikiData);
+*/
+L.control.layers(baseMaps, overlays).addTo(mymap);
