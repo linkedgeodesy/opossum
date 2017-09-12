@@ -41,7 +41,7 @@ $.ajax({
 var mymap = L.map('mapid', {
   center: [39.4699075, -0.3762881000000107],
   zoom: 12,
-  layers: [hotMap, kreis_circ]//, wikiData]
+  layers: [hotMap, kreis_circ]
 });
 
 var baseMaps = {
@@ -51,13 +51,6 @@ var baseMaps = {
 
 var overlays ={
   "Kreis": kreis_circ
-  //"Wikipedia": wikiData
 }
-//var overlayMaps = L.layerGroup().addTo(mymap);
 
-/*
-console.log(overlayMaps);
-console.log(overlayMaps._layers);
-console.log(wikiData);
-*/
 L.control.layers(baseMaps, overlays).addTo(mymap);
