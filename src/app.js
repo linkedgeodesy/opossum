@@ -65,7 +65,7 @@ $.ajax({
             let marker = L.marker([geosearch[item].lat, geosearch[item].lon]);
             marker.properties = {};
             marker.properties.wiki1 = geosearch[item];
-            marker.bindPopup(marker.properties.wiki1.title+getTypesFromDBpedia(geosearch[item]));
+            marker.bindPopup("<a href='https://en.wikipedia.org/wiki/"+marker.properties.wiki1.title+"' target='_blank'>"+marker.properties.wiki1.title+"</a>"+getTypesFromDBpedia(geosearch[item]));
             wikipedia.addLayer(marker);
         }
     }
