@@ -92,7 +92,8 @@ $.ajax({
 var stylePlaceOfWorship = {
     "color": "#ff7800",
     "weight": 5,
-    "opacity": 0.9
+    "opacity": 1.0,
+    "fillOpacity": 0.8
 };
 
 // load place of worships via linkedgeodata.org
@@ -114,6 +115,12 @@ $.ajax({
                 var line = turf.lineString(coord);
                 var polygon = turf.lineStringToPolygon(line);
                 geojson = polygon;
+            } else if (bindings[item].geo.value.includes("POINT")) {
+                let coord = turf.getCoords(geojson);
+                let point = turf.point(coord);
+                let buffer = turf.buffer(point, 10, "meters");
+                let envelope = turf.envelope(buffer);
+                geojson = envelope;
             }
             let marker = L.geoJson(geojson, {style: stylePlaceOfWorship});
             marker.properties = {};
@@ -126,9 +133,10 @@ $.ajax({
 });
 
 var styleRestaurant = {
-    "color": "#00FF00",
+    "color": "#447550",
     "weight": 5,
-    "opacity": 0.9
+    "opacity": 1.0,
+    "fillOpacity": 0.8
 };
 
 // load restaurants via linkedgeodata.org
@@ -146,10 +154,16 @@ $.ajax({
             let geojson = wellknown.parse(bindings[item].geo.value);
             // LINESTRING TO POLYGON VIA turf
             if (bindings[item].geo.value.includes("LINESTRING")) {
-                var coord = turf.getCoords(geojson);
-                var line = turf.lineString(coord);
-                var polygon = turf.lineStringToPolygon(line);
+                let coord = turf.getCoords(geojson);
+                let line = turf.lineString(coord);
+                let polygon = turf.lineStringToPolygon(line);
                 geojson = polygon;
+            } else if (bindings[item].geo.value.includes("POINT")) {
+                let coord = turf.getCoords(geojson);
+                let point = turf.point(coord);
+                let buffer = turf.buffer(point, 10, "meters");
+                let envelope = turf.envelope(buffer);
+                geojson = envelope;
             }
             let marker = L.geoJson(geojson, {style: styleRestaurant});
             marker.properties = {};
