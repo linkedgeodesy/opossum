@@ -28,7 +28,7 @@ let buffer = L.circle([lat, lon], {
 let wikipedia = L.layerGroup();
 
 let getTypesFromDBpedia = (json) => {
-    let types = "";
+    let types = "<br><br><b>types</b><br>";
     $.ajax({
         type: "GET",
         url: "http://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=SELECT+*+WHERE+%7B+%3Fs+%3Chttp%3A%2F%2Fdbpedia.org%2Fontology%2FwikiPageID%3E+%22"+json.pageid+"%22%5E%5Exsd%3Ainteger+.+%3Fs+%3Fp+%3Fo+.%0D%0A%7D&format=application%2Fsparql-results%2Bjson&CXML_redir_for_subjs=121&CXML_redir_for_hrefs=&timeout=30000&run=+Run+Query+",
@@ -65,7 +65,7 @@ $.ajax({
             let marker = L.marker([geosearch[item].lat, geosearch[item].lon]);
             marker.properties = {};
             marker.properties.wiki1 = geosearch[item];
-            marker.bindPopup(marker.properties.wiki1.title+" <br><br><b>types</b><br>"+getTypesFromDBpedia(geosearch[item]));
+            marker.bindPopup(marker.properties.wiki1.title+getTypesFromDBpedia(geosearch[item]));
             wikipedia.addLayer(marker);
         }
     }
