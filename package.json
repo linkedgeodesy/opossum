@@ -18,10 +18,8 @@
   "repository": "https://github.com/linkedgeodesy/opossum",
   "homepage": "https://github.com/linkedgeodesy/opossum",
   "dependencies": {
-    "jquery": "^3.2.1",
-    "jquery-ui": "^1.12.1",
-    "leaflet": "^1.2.0",
-    "materialize-css": "^0.100.1"
+    "materialize-css": "^0.100.1",
+    "leaflet": "^1.2.0"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",

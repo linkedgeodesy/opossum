@@ -8,3 +8,15 @@ body {
 }
 
 .map { width:1200px; height: 800px;}
+
+input[type="checkbox"].leaflet-control-layers-selector {
+  position: inherit !important;
+  left: inherit !important;
+  opacity: 1 !important;
+}
+
+input[type="radio"].leaflet-control-layers-selector {
+  position: inherit !important;
+  left: inherit !important;
+  opacity: 1 !important;
+}
