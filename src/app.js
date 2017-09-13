@@ -14,12 +14,14 @@ let osmMap = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 });
 
 // add circle
-let kreis_circ = L.circle([39.4699075, -0.3762881000000107], {
+let buffer = L.circle([39.4699075, -0.3762881000000107], {
     color: "red",
     fillColor: "#f03",
     fillOpacity: 0.5,
     radius: 10000
 });
+
+let wikipedia = L.layerGroup();
 
 // read valencia data from wikipedia api
 $.ajax({
@@ -31,8 +33,9 @@ $.ajax({
     success: function (data) {
         let geosearch = data.query.geosearch;
         for (var item in geosearch) {
-            let marker = L.marker([geosearch[item].lat, geosearch[item].lon]).addTo(mymap);
+            let marker = L.marker([geosearch[item].lat, geosearch[item].lon]);
             marker.bindPopup(geosearch[item].title);
+            wikipedia.addLayer(marker);
         }
     }
 });
@@ -41,7 +44,7 @@ $.ajax({
 let mymap = L.map("mapid", {
     center: [39.4699075, -0.3762881000000107],
     zoom: 12,
-    layers: [hotMap, kreis_circ]
+    layers: [hotMap, buffer, wikipedia]
 });
 
 let baseMaps = {
@@ -50,7 +53,8 @@ let baseMaps = {
 };
 
 let overlays ={
-    "Kreis": kreis_circ
+    "Buffer": buffer,
+    "wikipedia": wikipedia
 };
 
 L.control.layers(baseMaps, overlays).addTo(mymap);
