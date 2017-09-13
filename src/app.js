@@ -1,10 +1,16 @@
 import "./style/style.css";
 import * as $ from "jquery";
 import * as L from "leaflet";
+import * as WK from "wellknown";
 
 let lat = 39.4699075;
 let lon = -0.3762881000000107;
 let radius = 10000;
+
+let lat_mz = 50.0;
+let lon_mz = 8.271111;
+let radius_mz = 10;
+let lgdtype = "PlaceOfWorship"; //Museum School PlaceOfWorship Restaurant
 
 // set tile layer
 let hotMap = L.tileLayer("http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
@@ -25,7 +31,15 @@ let buffer = L.circle([lat, lon], {
     radius: radius
 });
 
+let buffer2 = L.circle([lat_mz, lon_mz], {
+    color: "red",
+    fillColor: "#f03",
+    fillOpacity: 0.5,
+    radius: radius
+});
+
 let wikipedia = L.layerGroup();
+let PlaceOfWorship = L.layerGroup();
 
 let getTypesFromDBpedia = (json) => {
     let types = "<br><br><b>types</b><br>";
@@ -71,11 +85,31 @@ $.ajax({
     }
 });
 
+$.ajax({
+    type: "GET",
+    url: "http://linkedgeodata.org/sparql?default-graph-uri=http%3A%2F%2Flinkedgeodata.org&query=Prefix+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APrefix+ogc%3A+%3Chttp%3A%2F%2Fwww.opengis.net%2Font%2Fgeosparql%23%3E%0D%0APrefix+geom%3A+%3Chttp%3A%2F%2Fgeovocab.org%2Fgeometry%23%3E%0D%0APrefix+lgdo%3A+%3Chttp%3A%2F%2Flinkedgeodata.org%2Fontology%2F%3E%0D%0A%0D%0ASelect+%3Fitem+%3Flabel+%3Fgeo%0D%0AFrom+%3Chttp%3A%2F%2Flinkedgeodata.org%3E+%7B%0D%0A++%3Fitem%0D%0A++++a+lgdo%3A"+lgdtype+"+%3B%0D%0A++++rdfs%3Alabel+%3Flabel+%3B%0D%0A++++geom%3Ageometry+%5B%0D%0A++++++ogc%3AasWKT+%3Fgeo%0D%0A++++%5D+.%0D%0A+++%0D%0A++Filter+%28%0D%0A++++bif%3Ast_intersects+%28%3Fgeo%2C+bif%3Ast_point+%28"+lon_mz+"%2C+"+lat_mz+"%29%2C+"+radius_mz+"%29%0D%0A++%29+.%0D%0A%7D&format=application%2Fsparql-results%2Bjson&timeout=0&debug=on",
+    async: false,
+    error: function (jqXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+    },
+    success: function (data) {
+        let bindings = data.results.bindings;
+        for (var item in bindings) {
+            let marker = L.geoJson(WK.parse(bindings[item].geo.value));
+            marker.properties = {};
+            marker.properties.item = bindings[item].item.value;
+            marker.properties.label = bindings[item].label.value;
+            marker.bindPopup(marker.properties.label);
+            PlaceOfWorship.addLayer(marker);
+        }
+    }
+});
+
 // init map
 let mymap = L.map("mapid", {
-    center: [lat, lon],
-    zoom: 12,
-    layers: [hotMap, buffer, wikipedia]
+    center: [45.758889, 4.841389],
+    zoom: 5,
+    layers: [hotMap, buffer, wikipedia, PlaceOfWorship, buffer2]
 });
 
 let baseMaps = {
@@ -85,7 +119,9 @@ let baseMaps = {
 
 let overlays ={
     "Buffer": buffer,
-    "wikipedia": wikipedia
+    "wikipedia": wikipedia,
+    "Buffer2": buffer2,
+    "LGD PlaceOfWorship": PlaceOfWorship
 };
 
 L.control.layers(baseMaps, overlays).addTo(mymap);
