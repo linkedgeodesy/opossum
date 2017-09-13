@@ -13,6 +13,7 @@ let lat_mz = 50.0;
 let lon_mz = 8.271111;
 let radius_mz = 10;
 let lgdtype = "PlaceOfWorship"; //Museum School PlaceOfWorship Restaurant
+let lgdtype2 = "Restaurant"; //Museum School PlaceOfWorship Restaurant
 
 // set tile layer
 let hotMap = L.tileLayer("http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
@@ -42,6 +43,7 @@ let buffer2 = L.circle([lat_mz, lon_mz], {
 
 let wikipedia = L.layerGroup();
 let PlaceOfWorship = L.layerGroup();
+let Restaurant = L.layerGroup();
 
 let getTypesFromDBpedia = (json) => {
     let types = "<br><br><b>types</b><br>";
@@ -93,6 +95,7 @@ var stylePlaceOfWorship = {
     "opacity": 0.9
 };
 
+// load place of worships via linkedgeodata.org
 $.ajax({
     type: "GET",
     url: "http://linkedgeodata.org/sparql?default-graph-uri=http%3A%2F%2Flinkedgeodata.org&query=Prefix+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APrefix+ogc%3A+%3Chttp%3A%2F%2Fwww.opengis.net%2Font%2Fgeosparql%23%3E%0D%0APrefix+geom%3A+%3Chttp%3A%2F%2Fgeovocab.org%2Fgeometry%23%3E%0D%0APrefix+lgdo%3A+%3Chttp%3A%2F%2Flinkedgeodata.org%2Fontology%2F%3E%0D%0A%0D%0ASelect+%3Fitem+%3Flabel+%3Fgeo%0D%0AFrom+%3Chttp%3A%2F%2Flinkedgeodata.org%3E+%7B%0D%0A++%3Fitem%0D%0A++++a+lgdo%3A"+lgdtype+"+%3B%0D%0A++++rdfs%3Alabel+%3Flabel+%3B%0D%0A++++geom%3Ageometry+%5B%0D%0A++++++ogc%3AasWKT+%3Fgeo%0D%0A++++%5D+.%0D%0A+++%0D%0A++Filter+%28%0D%0A++++bif%3Ast_intersects+%28%3Fgeo%2C+bif%3Ast_point+%28"+lon_mz+"%2C+"+lat_mz+"%29%2C+"+radius_mz+"%29%0D%0A++%29+.%0D%0A%7D&format=application%2Fsparql-results%2Bjson&timeout=0&debug=on",
@@ -122,11 +125,47 @@ $.ajax({
     }
 });
 
+var styleRestaurant = {
+    "color": "#00FF00",
+    "weight": 5,
+    "opacity": 0.9
+};
+
+// load restaurants via linkedgeodata.org
+$.ajax({
+    type: "GET",
+    url: "http://linkedgeodata.org/sparql?default-graph-uri=http%3A%2F%2Flinkedgeodata.org&query=Prefix+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APrefix+ogc%3A+%3Chttp%3A%2F%2Fwww.opengis.net%2Font%2Fgeosparql%23%3E%0D%0APrefix+geom%3A+%3Chttp%3A%2F%2Fgeovocab.org%2Fgeometry%23%3E%0D%0APrefix+lgdo%3A+%3Chttp%3A%2F%2Flinkedgeodata.org%2Fontology%2F%3E%0D%0A%0D%0ASelect+%3Fitem+%3Flabel+%3Fgeo%0D%0AFrom+%3Chttp%3A%2F%2Flinkedgeodata.org%3E+%7B%0D%0A++%3Fitem%0D%0A++++a+lgdo%3A"+lgdtype2+"+%3B%0D%0A++++rdfs%3Alabel+%3Flabel+%3B%0D%0A++++geom%3Ageometry+%5B%0D%0A++++++ogc%3AasWKT+%3Fgeo%0D%0A++++%5D+.%0D%0A+++%0D%0A++Filter+%28%0D%0A++++bif%3Ast_intersects+%28%3Fgeo%2C+bif%3Ast_point+%28"+lon_mz+"%2C+"+lat_mz+"%29%2C+"+radius_mz+"%29%0D%0A++%29+.%0D%0A%7D&format=application%2Fsparql-results%2Bjson&timeout=0&debug=on",
+    async: false,
+    error: function (jqXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+    },
+    success: function (data) {
+        let bindings = data.results.bindings;
+        for (var item in bindings) {
+            // WKT TO GEOJSON via
+            let geojson = wellknown.parse(bindings[item].geo.value);
+            // LINESTRING TO POLYGON VIA turf
+            if (bindings[item].geo.value.includes("LINESTRING")) {
+                var coord = turf.getCoords(geojson);
+                var line = turf.lineString(coord);
+                var polygon = turf.lineStringToPolygon(line);
+                geojson = polygon;
+            }
+            let marker = L.geoJson(geojson, {style: styleRestaurant});
+            marker.properties = {};
+            marker.properties.item = bindings[item].item.value;
+            marker.properties.label = bindings[item].label.value;
+            marker.bindPopup("<i class='small material-icons'>account_balance</i>"+marker.properties.label);
+            Restaurant.addLayer(marker);
+        }
+    }
+});
+
 // init map
 let mymap = L.map("mapid", {
     center: [45.758889, 4.841389],
     zoom: 5,
-    layers: [osmMap, buffer, wikipedia, buffer2, PlaceOfWorship]
+    layers: [osmMap, buffer, wikipedia, buffer2, PlaceOfWorship, Restaurant]
 });
 
 let baseMaps = {
@@ -138,7 +177,8 @@ let overlays ={
     "Buffer Wikipedia": buffer,
     "wikipedia": wikipedia,
     "Buffer LGD": buffer2,
-    "LGD PlaceOfWorship": PlaceOfWorship
+    "LGD PlaceOfWorship": PlaceOfWorship,
+    "LGD Restaurant": Restaurant
 };
 
 L.control.layers(baseMaps, overlays).addTo(mymap);
