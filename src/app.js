@@ -2,6 +2,10 @@ import "./style/style.css";
 import * as $ from "jquery";
 import * as L from "leaflet";
 
+let lat = 39.4699075;
+let lon = -0.3762881000000107;
+let radius = 10000;
+
 // set tile layer
 let hotMap = L.tileLayer("http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
     maxZoom: 19,
@@ -14,11 +18,11 @@ let osmMap = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 });
 
 // add circle
-let buffer = L.circle([39.4699075, -0.3762881000000107], {
+let buffer = L.circle([lat, lon], {
     color: "red",
     fillColor: "#f03",
     fillOpacity: 0.5,
-    radius: 10000
+    radius: radius
 });
 
 let wikipedia = L.layerGroup();
@@ -26,7 +30,7 @@ let wikipedia = L.layerGroup();
 // read valencia data from wikipedia api
 $.ajax({
     type: "GET",
-    url: "https://en.wikipedia.org/w/api.php?action=query&gsmaxdim=10000&list=geosearch&gslimit=1000&gsradius=10000&gscoord=39.4699075|-0.3762881000000107&continue&format=json&origin=*",
+    url: "https://en.wikipedia.org/w/api.php?action=query&gsmaxdim=10000&list=geosearch&gslimit=1000&gsradius="+radius+"&gscoord="+lat+"|"+lon+"&continue&format=json&origin=*",
     error: function (jqXHR, textStatus, errorThrown) {
         alert(errorThrown);
     },
@@ -42,7 +46,7 @@ $.ajax({
 
 // init map
 let mymap = L.map("mapid", {
-    center: [39.4699075, -0.3762881000000107],
+    center: [lat, lon],
     zoom: 12,
     layers: [hotMap, buffer, wikipedia]
 });
