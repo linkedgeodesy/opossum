@@ -67,6 +67,13 @@ let getTypesFromDBpedia = (json) => {
     return types;
 };
 
+var styleValencia = {
+    "color": "#0000FF",
+    "weight": 5,
+    "opacity": 1.0,
+    "fillOpacity": 0.8
+};
+
 // read valencia data from wikipedia api
 $.ajax({
     type: "GET",
@@ -78,7 +85,10 @@ $.ajax({
     success: function (data) {
         let geosearch = data.query.geosearch;
         for (var item in geosearch) {
-            let marker = L.marker([geosearch[item].lat, geosearch[item].lon]);
+            let point = turf.point([geosearch[item].lon, geosearch[item].lat]);
+            let buffer = turf.buffer(point, 20, "meters");
+            let envelope = turf.envelope(buffer);
+            let marker = L.geoJson(envelope, {style: styleValencia});
             marker.properties = {};
             marker.properties.wiki1 = geosearch[item];
             marker.bindPopup("<a href='https://en.wikipedia.org/wiki/"+marker.properties.wiki1.title+"' target='_blank'>"+marker.properties.wiki1.title+"</a>"+getTypesFromDBpedia(geosearch[item]));
@@ -124,7 +134,7 @@ $.ajax({
             marker.properties = {};
             marker.properties.item = bindings[item].item.value;
             marker.properties.label = bindings[item].label.value;
-            marker.bindPopup("<i class='fa fa-bell' aria-hidden='true'></i>"+marker.properties.label);
+            marker.bindPopup("<i class='fa fa-bell' aria-hidden='true'></i><br><br>"+marker.properties.label);
             PlaceOfWorship.addLayer(marker);
         }
     }
@@ -167,7 +177,7 @@ $.ajax({
             marker.properties = {};
             marker.properties.item = bindings[item].item.value;
             marker.properties.label = bindings[item].label.value;
-            marker.bindPopup("<i class='fa fa-glass' aria-hidden='true'></i>"+marker.properties.label);
+            marker.bindPopup("<i class='fa fa-glass' aria-hidden='true'></i><br><br>"+marker.properties.label);
             Restaurant.addLayer(marker);
         }
     }
@@ -175,8 +185,8 @@ $.ajax({
 
 // init map
 let mymap = L.map("mapid", {
-    center: [45.758889, 4.841389],
-    zoom: 5,
+    center: [45.5, 4.8],
+    zoom: 6,
     layers: [osmMap, buffer, wikipedia, buffer2, PlaceOfWorship, Restaurant]
 });
 
