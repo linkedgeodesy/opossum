@@ -28,15 +28,13 @@ let osmMap = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 // add circle
 let buffer = L.circle([lat, lon], {
-    color: "red",
-    fillColor: "#f03",
+    color: "#000",
     fillOpacity: 0.0,
     radius: radius
 });
 
 let buffer2 = L.circle([lat_mz, lon_mz], {
-    color: "red",
-    fillColor: "#f03",
+    color: "#000",
     fillOpacity: 0.0,
     radius: radius
 });
@@ -126,7 +124,7 @@ $.ajax({
             marker.properties = {};
             marker.properties.item = bindings[item].item.value;
             marker.properties.label = bindings[item].label.value;
-            marker.bindPopup("<i class='small material-icons'>account_balance</i>"+marker.properties.label);
+            marker.bindPopup("<i class='fa fa-bell' aria-hidden='true'></i>"+marker.properties.label);
             PlaceOfWorship.addLayer(marker);
         }
     }
@@ -169,7 +167,7 @@ $.ajax({
             marker.properties = {};
             marker.properties.item = bindings[item].item.value;
             marker.properties.label = bindings[item].label.value;
-            marker.bindPopup("<i class='small material-icons'>account_balance</i>"+marker.properties.label);
+            marker.bindPopup("<i class='fa fa-glass' aria-hidden='true'></i>"+marker.properties.label);
             Restaurant.addLayer(marker);
         }
     }
