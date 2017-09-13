@@ -18,6 +18,7 @@
   "repository": "https://github.com/linkedgeodesy/opossum",
   "homepage": "https://github.com/linkedgeodesy/opossum",
   "dependencies": {
+    "@turf/turf": "^4.7.3",
     "leaflet": "^1.2.0",
     "materialize-css": "^0.100.1",
     "wellknown": "^0.5.0"
