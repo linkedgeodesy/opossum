@@ -47,6 +47,7 @@ let wikipedia = L.layerGroup();
 let PlaceOfWorship = L.layerGroup();
 let Restaurant = L.layerGroup();
 let walkingArea = L.layerGroup();
+let cyclingArea = L.layerGroup();
 
 let getTypesFromDBpedia = (json) => {
     let types = "<br><br><b>types</b><br>";
@@ -205,8 +206,30 @@ $.ajax({
     },
     success: function (data) {
         let marker = L.geoJson(data, {style: styleWalkingArea});
-        marker.bindPopup();
+        marker.bindPopup("walking 25 minutes");
         walkingArea.addLayer(marker);
+    }
+});
+
+var styleCyclingArea = {
+    "color": "lightblue",
+    "weight": 5,
+    "opacity": 1.0,
+    "fillOpacity": 0.8
+};
+
+// load cycling area via openrouteservice.org
+$.ajax({
+    type: "GET",
+    url: "https://api.openrouteservice.org/isochrones?locations="+lon_mz+"%2C"+lat_mz+"&profile=cycling-regular&range_type=time&range="+range_mz+"&location_type=start&api_key="+ors_key,
+    async: false,
+    error: function (jqXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+    },
+    success: function (data) {
+        let marker = L.geoJson(data, {style: styleCyclingArea});
+        marker.bindPopup("cycling 25 minutes");
+        cyclingArea.addLayer(marker);
     }
 });
 
@@ -214,7 +237,7 @@ $.ajax({
 let mymap = L.map("mapid", {
     center: [45.5, 4.8],
     zoom: 6,
-    layers: [osmMap, buffer, wikipedia, buffer2, walkingArea, PlaceOfWorship, Restaurant]
+    layers: [osmMap, buffer, wikipedia, buffer2, cyclingArea, walkingArea, PlaceOfWorship, Restaurant]
 });
 
 let baseMaps = {
@@ -228,7 +251,9 @@ let overlays ={
     "Buffer LGD": buffer2,
     "LGD PlaceOfWorship": PlaceOfWorship,
     "LGD Restaurant": Restaurant,
-    "ORS WalkingArea 25min": walkingArea
+    "ORS WalkingArea 25min": walkingArea,
+    "ORS CyclingArea 25min": cyclingArea
 };
 
 L.control.layers(baseMaps, overlays).addTo(mymap);
+mymap.fitBounds(mymap.getBounds());
