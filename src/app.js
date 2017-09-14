@@ -73,6 +73,25 @@ let getTypesFromDBpedia = (json) => {
     return types;
 };
 
+let getThumbnailFromWikipedia = (json) => {
+    let thumbnail_img = "";
+    $.ajax({
+        type: "GET",
+        url: "https://en.wikipedia.org/w/api.php?action=query&pageids="+json.pageid+"&prop=info%7Cextracts%7Ccoordinates%7Cpageimages&coprop=type%7Cname%7Cdim&inprop=url&exchars=500&exsectionformat=plain&explaintext&continue=&format=json&pithumbsize=250&format=json&origin=*",
+        async: false,
+        error: function (jqXHR, textStatus, errorThrown) {
+            //alert(errorThrown);
+        },
+        success: function (data) {
+            let thumbnail = data.query.pages[json.pageid].thumbnail;
+            if (thumbnail) {
+                thumbnail_img += "<br><br><img src='"+thumbnail.source+"' width='250'>";
+            }
+        }
+    });
+    return thumbnail_img;
+};
+
 var styleValencia = {
     "color": "#0000FF",
     "weight": 5,
@@ -96,8 +115,9 @@ $.ajax({
             let envelope = turf.envelope(buffer);
             let marker = L.geoJson(envelope, {style: styleValencia});
             marker.properties = {};
-            marker.properties.wiki1 = geosearch[item];
-            marker.bindPopup("<a href='https://en.wikipedia.org/wiki/"+marker.properties.wiki1.title+"' target='_blank'>"+marker.properties.wiki1.title+"</a>"+getTypesFromDBpedia(geosearch[item]));
+            marker.properties.wiki = geosearch[item];
+            marker.bindPopup("<a href='https://en.wikipedia.org/wiki/"+marker.properties.wiki.title+"' target='_blank'>"+marker.properties.wiki.title+"</a>"+getThumbnailFromWikipedia(geosearch[item]));
+            //marker.bindPopup("<a href='https://en.wikipedia.org/wiki/"+marker.properties.wiki.title+"' target='_blank'>"+marker.properties.wiki.title+"</a>"+getTypesFromDBpedia(geosearch[item]));
             wikipedia.addLayer(marker);
         }
     }
