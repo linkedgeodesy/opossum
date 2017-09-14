@@ -116,7 +116,7 @@ $.ajax({
             let marker = L.geoJson(envelope, {style: styleValencia});
             marker.properties = {};
             marker.properties.wiki = geosearch[item];
-            marker.bindPopup("<a href='https://en.wikipedia.org/wiki/"+marker.properties.wiki.title+"' target='_blank'>"+marker.properties.wiki.title+"</a>"+getThumbnailFromWikipedia(geosearch[item]));
+            //marker.bindPopup("<a href='https://en.wikipedia.org/wiki/"+marker.properties.wiki.title+"' target='_blank'>"+marker.properties.wiki.title+"</a>"+getThumbnailFromWikipedia(geosearch[item]));
             //marker.bindPopup("<a href='https://en.wikipedia.org/wiki/"+marker.properties.wiki.title+"' target='_blank'>"+marker.properties.wiki.title+"</a>"+getTypesFromDBpedia(geosearch[item]));
             wikipedia.addLayer(marker);
         }
@@ -277,3 +277,9 @@ let overlays ={
 
 L.control.layers(baseMaps, overlays).addTo(mymap);
 mymap.fitBounds(mymap.getBounds());
+
+// set wikipedia popups asynch
+wikipedia.eachLayer(function(layer){
+    let wikiproperties = layer.properties.wiki;
+    layer.bindPopup("<a href='https://en.wikipedia.org/wiki/"+wikiproperties.title+"' target='_blank'>"+wikiproperties.title+"</a>"+getThumbnailFromWikipedia(wikiproperties));
+});
