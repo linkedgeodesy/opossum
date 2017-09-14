@@ -5,6 +5,8 @@ import * as wellknown from "wellknown";
 import * as turf from "@turf/turf";
 import "materialize-css";
 
+let ors_key = "58d904a497c67e00015b45fcd2e10661dfa14f2d46c679d259b00197";
+
 let lat = 39.4699075;
 let lon = -0.3762881000000107;
 let radius = 10000;
@@ -14,6 +16,8 @@ let lon_mz = 8.271111;
 let radius_mz = 10;
 let lgdtype = "PlaceOfWorship"; //Museum School PlaceOfWorship Restaurant
 let lgdtype2 = "Restaurant"; //Museum School PlaceOfWorship Restaurant
+let range_mz_min = 25;
+let range_mz = range_mz_min*60;
 
 // set tile layer
 let hotMap = L.tileLayer("http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
@@ -42,6 +46,7 @@ let buffer2 = L.circle([lat_mz, lon_mz], {
 let wikipedia = L.layerGroup();
 let PlaceOfWorship = L.layerGroup();
 let Restaurant = L.layerGroup();
+let walkingArea = L.layerGroup();
 
 let getTypesFromDBpedia = (json) => {
     let types = "<br><br><b>types</b><br>";
@@ -183,11 +188,33 @@ $.ajax({
     }
 });
 
+var styleWalkingArea = {
+    "color": "grey",
+    "weight": 5,
+    "opacity": 1.0,
+    "fillOpacity": 0.8
+};
+
+// load waking area via openrouteservice.org
+$.ajax({
+    type: "GET",
+    url: "https://api.openrouteservice.org/isochrones?locations="+lon_mz+"%2C"+lat_mz+"&profile=foot-walking&range_type=time&range="+range_mz+"&location_type=start&api_key="+ors_key,
+    async: false,
+    error: function (jqXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+    },
+    success: function (data) {
+        let marker = L.geoJson(data, {style: styleWalkingArea});
+        marker.bindPopup();
+        walkingArea.addLayer(marker);
+    }
+});
+
 // init map
 let mymap = L.map("mapid", {
     center: [45.5, 4.8],
     zoom: 6,
-    layers: [osmMap, buffer, wikipedia, buffer2, PlaceOfWorship, Restaurant]
+    layers: [osmMap, buffer, wikipedia, buffer2, walkingArea, PlaceOfWorship, Restaurant]
 });
 
 let baseMaps = {
@@ -200,7 +227,8 @@ let overlays ={
     "wikipedia": wikipedia,
     "Buffer LGD": buffer2,
     "LGD PlaceOfWorship": PlaceOfWorship,
-    "LGD Restaurant": Restaurant
+    "LGD Restaurant": Restaurant,
+    "ORS WalkingArea 25min": walkingArea
 };
 
 L.control.layers(baseMaps, overlays).addTo(mymap);
