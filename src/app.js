@@ -14,8 +14,9 @@ let radius = 10000;
 let lat_mz = 50.0;
 let lon_mz = 8.271111;
 let radius_mz = 10;
-let lgdtype = "PlaceOfWorship"; //Museum School PlaceOfWorship Restaurant
-let lgdtype2 = "Restaurant"; //Museum School PlaceOfWorship Restaurant
+let lgdtype = "PlaceOfWorship"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
+let lgdtype2 = "Restaurant"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
+let lgdtype3 = "PublicTransportThing"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
 let range_mz_min = 25;
 let range_mz = range_mz_min*60;
 
@@ -46,6 +47,7 @@ let buffer2 = L.circle([lat_mz, lon_mz], {
 let wikipedia = L.layerGroup();
 let PlaceOfWorship = L.layerGroup();
 let Restaurant = L.layerGroup();
+let BusStation = L.layerGroup();
 let walkingArea = L.layerGroup();
 let cyclingArea = L.layerGroup();
 
@@ -209,6 +211,55 @@ $.ajax({
     }
 });
 
+var styleBus = {
+    "color": "purple",
+    "weight": 5,
+    "opacity": 1.0,
+    "fillOpacity": 0.8
+};
+
+// load busstations via linkedgeodata.org
+$.ajax({
+    type: "GET",
+    url: "http://linkedgeodata.org/sparql?default-graph-uri=http%3A%2F%2Flinkedgeodata.org&query=Prefix+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APrefix+ogc%3A+%3Chttp%3A%2F%2Fwww.opengis.net%2Font%2Fgeosparql%23%3E%0D%0APrefix+geom%3A+%3Chttp%3A%2F%2Fgeovocab.org%2Fgeometry%23%3E%0D%0APrefix+lgdo%3A+%3Chttp%3A%2F%2Flinkedgeodata.org%2Fontology%2F%3E%0D%0A%0D%0ASelect+%3Fitem+%3Flabel+%3Fgeo%0D%0AFrom+%3Chttp%3A%2F%2Flinkedgeodata.org%3E+%7B%0D%0A++%3Fitem%0D%0A++++a+lgdo%3A"+lgdtype3+"+%3B%0D%0A++++rdfs%3Alabel+%3Flabel+%3B%0D%0A++++geom%3Ageometry+%5B%0D%0A++++++ogc%3AasWKT+%3Fgeo%0D%0A++++%5D+.%0D%0A+++%0D%0A++Filter+%28%0D%0A++++bif%3Ast_intersects+%28%3Fgeo%2C+bif%3Ast_point+%28"+lon_mz+"%2C+"+lat_mz+"%29%2C+"+radius_mz+"%29%0D%0A++%29+.%0D%0A%7D&format=application%2Fsparql-results%2Bjson&timeout=0&debug=on",
+    async: false,
+    error: function (jqXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+    },
+    success: function (data) {
+        let bindings = data.results.bindings;
+        for (var item in bindings) {
+            // WKT TO GEOJSON via
+            let geojson = wellknown.parse(bindings[item].geo.value);
+            // LINESTRING TO POLYGON VIA turf
+            try {
+                if (bindings[item].geo.value.includes("LINESTRING")) {
+                    let coord = turf.getCoords(geojson);
+                    let line = turf.lineString(coord);
+                    let polygon = turf.lineStringToPolygon(line);
+                    geojson = polygon;
+                } else if (bindings[item].geo.value.includes("POINT")) {
+                    let coord = turf.getCoords(geojson);
+                    let point = turf.point(coord);
+                    let buffer = turf.buffer(point, 10, "meters");
+                    let envelope = turf.envelope(buffer);
+                    geojson = envelope;
+                } else {
+                    console.log(bindings[item]);
+                }
+                let marker = L.geoJson(geojson, {style: styleBus});
+                marker.properties = {};
+                marker.properties.item = bindings[item].item.value;
+                marker.properties.label = bindings[item].label.value;
+                marker.bindPopup("<i class='fa fa-bus' aria-hidden='true'></i><br><br>"+marker.properties.label);
+                BusStation.addLayer(marker);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+    }
+});
+
 var styleWalkingArea = {
     "color": "grey",
     "weight": 5,
@@ -257,7 +308,7 @@ $.ajax({
 let mymap = L.map("mapid", {
     center: [45.5, 4.8],
     zoom: 6,
-    layers: [osmMap, buffer, wikipedia, buffer2, cyclingArea, walkingArea, PlaceOfWorship, Restaurant]
+    layers: [osmMap, buffer, wikipedia, buffer2, cyclingArea, walkingArea, PlaceOfWorship, Restaurant, BusStation]
 });
 
 let baseMaps = {
@@ -271,6 +322,7 @@ let overlays ={
     "Buffer LGD": buffer2,
     "LGD PlaceOfWorship": PlaceOfWorship,
     "LGD Restaurant": Restaurant,
+    "LGD Bus Station": BusStation,
     "ORS WalkingArea 25min": walkingArea,
     "ORS CyclingArea 25min": cyclingArea
 };
