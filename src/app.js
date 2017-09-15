@@ -21,24 +21,24 @@ let range_mz_min = 25;
 let range_mz = range_mz_min*60;
 
 // set tile layer
-let hotMap = L.tileLayer("http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+const hotMap = L.tileLayer("http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: "&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>, Tiles courtesy of <a href='http://hot.openstreetmap.org/' target='_blank'>Humanitarian OpenStreetMap Team</a>"
 });
 
-let osmMap = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+const osmMap = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: "&copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> Contributors"
 });
 
 // add circle
-let buffer = L.circle([lat, lon], {
+const buffer = L.circle([lat, lon], {
     color: "#000",
     fillOpacity: 0.0,
     radius: radius
 });
 
-let buffer2 = L.circle([lat_mz, lon_mz], {
+const buffer2 = L.circle([lat_mz, lon_mz], {
     color: "#000",
     fillOpacity: 0.0,
     radius: radius
@@ -62,7 +62,7 @@ let getTypesFromDBpedia = (json) => {
         },
         success: function (data) {
             let bindings = data.results.bindings;
-            for (var item in bindings) {
+            for (let item in bindings) {
                 if (bindings[item].p.value.includes("#type")) {
                     if (bindings[item].o.value.includes("http://dbpedia.org/ontology/")) {
                         let split = bindings[item].o.value.split("/");
@@ -94,7 +94,7 @@ let getThumbnailFromWikipedia = (json) => {
     return thumbnail_img;
 };
 
-var styleValencia = {
+const styleValencia = {
     "color": "#0000FF",
     "weight": 5,
     "opacity": 1.0,
@@ -111,7 +111,7 @@ $.ajax({
     },
     success: function (data) {
         let geosearch = data.query.geosearch;
-        for (var item in geosearch) {
+        for (let item in geosearch) {
             let point = turf.point([geosearch[item].lon, geosearch[item].lat]);
             let buffer = turf.buffer(point, 20, "meters");
             let envelope = turf.envelope(buffer);
@@ -125,7 +125,7 @@ $.ajax({
     }
 });
 
-var stylePlaceOfWorship = {
+const stylePlaceOfWorship = {
     "color": "#ff7800",
     "weight": 5,
     "opacity": 1.0,
@@ -142,14 +142,14 @@ $.ajax({
     },
     success: function (data) {
         let bindings = data.results.bindings;
-        for (var item in bindings) {
+        for (let item in bindings) {
             // WKT TO GEOJSON via
             let geojson = wellknown.parse(bindings[item].geo.value);
             // LINESTRING TO POLYGON VIA turf
             if (bindings[item].geo.value.includes("LINESTRING")) {
-                var coord = turf.getCoords(geojson);
-                var line = turf.lineString(coord);
-                var polygon = turf.lineStringToPolygon(line);
+                let coord = turf.getCoords(geojson);
+                let line = turf.lineString(coord);
+                let polygon = turf.lineStringToPolygon(line);
                 geojson = polygon;
             } else if (bindings[item].geo.value.includes("POINT")) {
                 let coord = turf.getCoords(geojson);
@@ -168,7 +168,7 @@ $.ajax({
     }
 });
 
-var styleRestaurant = {
+const styleRestaurant = {
     "color": "#447550",
     "weight": 5,
     "opacity": 1.0,
@@ -185,7 +185,7 @@ $.ajax({
     },
     success: function (data) {
         let bindings = data.results.bindings;
-        for (var item in bindings) {
+        for (let item in bindings) {
             // WKT TO GEOJSON via
             let geojson = wellknown.parse(bindings[item].geo.value);
             // LINESTRING TO POLYGON VIA turf
@@ -211,7 +211,7 @@ $.ajax({
     }
 });
 
-var styleBus = {
+const styleBus = {
     "color": "purple",
     "weight": 5,
     "opacity": 1.0,
@@ -228,7 +228,7 @@ $.ajax({
     },
     success: function (data) {
         let bindings = data.results.bindings;
-        for (var item in bindings) {
+        for (let item in bindings) {
             // WKT TO GEOJSON via
             let geojson = wellknown.parse(bindings[item].geo.value);
             // LINESTRING TO POLYGON VIA turf
@@ -260,7 +260,7 @@ $.ajax({
     }
 });
 
-var styleWalkingArea = {
+const styleWalkingArea = {
     "color": "grey",
     "weight": 5,
     "opacity": 1.0,
@@ -282,7 +282,7 @@ $.ajax({
     }
 });
 
-var styleCyclingArea = {
+const styleCyclingArea = {
     "color": "lightblue",
     "weight": 5,
     "opacity": 1.0,
@@ -305,18 +305,18 @@ $.ajax({
 });
 
 // init map
-let mymap = L.map("mapid", {
+const mymap = L.map("mapid", {
     center: [45.5, 4.8],
     zoom: 6,
     layers: [osmMap, buffer, wikipedia, buffer2, cyclingArea, walkingArea, PlaceOfWorship, Restaurant, BusStation]
 });
 
-let baseMaps = {
+const baseMaps = {
     "Hot": hotMap,
     "OSM Mapnik": osmMap
 };
 
-let overlays ={
+const overlays ={
     "Buffer Wikipedia": buffer,
     "wikipedia": wikipedia,
     "Buffer LGD": buffer2,
