@@ -14,21 +14,48 @@
 </head>
 <body>
     <div class="row">
-        <div id="mapid" class="map col s8" style="float:left;"></div>
+        <div id="mapid" class="map col s8"></div>
         <div class="row">
-            <div class="col 12">
-                <div style="float:left; margin:50px;" class="col 12">
-                    <img src="data/opossum.png" width="100"><br><h1>opossum</h1>
+            <div class="col s4">
+                <div class="col s12">
+                    <div class="card blue-grey white center-align" style="padding:50px;">
+                        <img src="data/opossum.png" height="100"><br><h3>opossum</h3>
+                    </div>
                 </div>
                 <div class="input-field col s12">
                     <input placeholder="50.0" id="lat" type="text" class="validate" value="50.0">
                     <label for="lat">lat</label>
                 </div>
-                <br>
                 <div class="input-field col s12">
                     <input placeholder="8.271111" id="lon" type="text" class="validate" value="8.271111">
                     <label for="lon">lon</label>
                 </div>
+                <div class="col s12">
+                    <p>
+                      <input type="checkbox" class="filled-in" id="worship" checked="checked" />
+                      <label for="worship">Place of Worship</label>
+                    </p>
+                    <p>
+                      <input type="checkbox" class="filled-in" id="restaurant" checked="checked" />
+                      <label for="restaurant">Restaurants</label>
+                    </p>
+                    <p>
+                      <input type="checkbox" class="filled-in" id="bus" checked="checked" />
+                      <label for="bus">Bus Stations</label>
+                    </p>
+                    <p>
+                      <input type="checkbox" class="filled-in" id="walkingarea" checked="checked" />
+                      <label for="walkingarea">Walking Area</label>
+                    </p>
+                    <p>
+                      <input type="checkbox" class="filled-in" id="cyclingarea" checked="checked" />
+                      <label for="cyclingarea">Cycling Area</label>
+                    </p>
+                    <p>
+                      <input type="checkbox" class="filled-in" id="wikipedia" checked="checked" />
+                      <label for="wikipedia">Wikipedia</label>
+                    </p>
+              </div>
                 <br>
                 <div class="input-field col s12">
                     <a class="waves-effect waves-light btn" href="#sign_up">load data</a>

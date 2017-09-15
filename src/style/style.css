@@ -7,7 +7,7 @@ body {
   background-color: white;
 }
 
-.map { width:1200px; height: 800px;}
+.map { height: 800px;}
 
 input[type="checkbox"].leaflet-control-layers-selector {
   position: inherit !important;

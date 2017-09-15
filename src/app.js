@@ -312,7 +312,7 @@ $("a[href='#sign_up']").click(function(){
         }
     });
 
-    // load waking area via openrouteservice.org
+    // load walking area via openrouteservice.org
     $.ajax({
         type: "GET",
         url: "https://api.openrouteservice.org/isochrones?locations="+lon_mz+"%2C"+lat_mz+"&profile=foot-walking&range_type=time&range="+range_mz+"&location_type=start&api_key="+ors_key,
