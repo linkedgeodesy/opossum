@@ -276,31 +276,41 @@ $("a[href='#sign_up']").click(function(){
             let bindings = data.results.bindings;
             for (let item in bindings) {
                 // WKT TO GEOJSON via
-                let geojson = wellknown.parse(bindings[item].geo.value);
-                // LINESTRING TO POLYGON VIA turf
                 try {
-                    if (bindings[item].geo.value.includes("LINESTRING")) {
+                    let geojson = wellknown.parse(bindings[item].geo.value);
+                    if (bindings[item].geo.value.includes("LINESTRING")) { // LINESTRING TO POLYGON VIA turf
                         let coord = turf.getCoords(geojson);
                         let line = turf.lineString(coord);
                         let polygon = turf.lineStringToPolygon(line);
                         geojson = polygon;
-                    } else if (bindings[item].geo.value.includes("POINT")) {
+                    } else if (bindings[item].geo.value.includes("POINT")) { //POINT TO ENVELOPE VIA turf
                         let coord = turf.getCoords(geojson);
                         let point = turf.point(coord);
                         let buffer = turf.buffer(point, 10, "meters");
                         let envelope = turf.envelope(buffer);
                         geojson = envelope;
                     } else {
-                        console.log(bindings[item]);
+                        //console.log(bindings[item]);
                     }
-                    let marker = L.geoJson(geojson, {style: styleBus});
-                    marker.properties = {};
-                    marker.properties.item = bindings[item].item.value;
-                    marker.properties.label = bindings[item].label.value;
-                    marker.bindPopup("<i class='fa fa-bus' aria-hidden='true'></i><br><br>"+marker.properties.label);
-                    BusStation.addLayer(marker);
+                    // create centroind from geom
+                    let coord_gj = turf.getCoords(geojson);
+                    let polygon = turf.polygon(coord_gj);
+                    let centroid = turf.centroid(polygon);
+                    // create buffer
+                    let point = turf.point([lon_mz, lat_mz]);
+                    let buffered = turf.buffer(point, radius_mz, "kilometers");
+                    // is point in buffer?
+                    let inside = turf.inside(centroid, buffered);
+                    if (inside) {
+                        let marker = L.geoJson(geojson, {style: styleBus});
+                        marker.properties = {};
+                        marker.properties.item = bindings[item].item.value;
+                        marker.properties.label = bindings[item].label.value;
+                        marker.bindPopup("<i class='fa fa-bus' aria-hidden='true'></i><br><br>"+marker.properties.label);
+                        BusStation.addLayer(marker);
+                    }
                 } catch (e) {
-                    console.log(e);
+                    //console.log(e);
                 }
             }
         }
@@ -340,9 +350,9 @@ $("a[href='#sign_up']").click(function(){
 
     $("#action").html("load wikipedia popups");
     // set wikipedia popups asynch
-    wikipedia.eachLayer(function(layer){
+    /*wikipedia.eachLayer(function(layer){
         let wikiproperties = layer.properties.wiki;
         layer.bindPopup("<a href='https://en.wikipedia.org/wiki/"+wikiproperties.title+"' target='_blank'>"+wikiproperties.title+"</a>"+getThumbnailFromWikipedia(wikiproperties));
-    });
+    });*/
 
 });
