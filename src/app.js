@@ -7,13 +7,10 @@ import "materialize-css";
 
 let ors_key = "58d904a497c67e00015b45fcd2e10661dfa14f2d46c679d259b00197";
 
-let lat = 39.4699075;
-let lon = -0.3762881000000107;
-let radius = 10000;
-
-let lat_mz = 50.0;
-let lon_mz = 8.271111;
+let lat_mz = -1;
+let lon_mz = -1;
 let radius_mz = 10;
+let radius_mz_wiki = radius_mz*1000;
 let lgdtype = "PlaceOfWorship"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
 let lgdtype2 = "Restaurant"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
 let lgdtype3 = "PublicTransportThing"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
@@ -31,19 +28,7 @@ const osmMap = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", 
     attribution: "&copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> Contributors"
 });
 
-// add circle
-const buffer = L.circle([lat, lon], {
-    color: "#000",
-    fillOpacity: 0.0,
-    radius: radius
-});
-
-const buffer2 = L.circle([lat_mz, lon_mz], {
-    color: "#000",
-    fillOpacity: 0.0,
-    radius: radius
-});
-
+let buffer = L.layerGroup();
 let wikipedia = L.layerGroup();
 let PlaceOfWorship = L.layerGroup();
 let Restaurant = L.layerGroup();
@@ -54,8 +39,8 @@ let cyclingArea = L.layerGroup();
 // init map
 const mymap = L.map("mapid", {
     center: [45.5, 4.8],
-    zoom: 6,
-    layers: [osmMap, buffer, wikipedia, buffer2, cyclingArea, walkingArea, PlaceOfWorship, Restaurant, BusStation]
+    zoom: 5,
+    layers: [osmMap, buffer, wikipedia, cyclingArea, walkingArea, PlaceOfWorship, Restaurant, BusStation]
 });
 
 const baseMaps = {
@@ -64,9 +49,8 @@ const baseMaps = {
 };
 
 const overlays ={
-    "Buffer Wikipedia": buffer,
-    "wikipedia": wikipedia,
-    "Buffer LGD": buffer2,
+    "Buffer": buffer,
+    "Wikipedia": wikipedia,
     "LGD PlaceOfWorship": PlaceOfWorship,
     "LGD Restaurant": Restaurant,
     "LGD Bus Station": BusStation,
@@ -75,7 +59,6 @@ const overlays ={
 };
 
 L.control.layers(baseMaps, overlays).addTo(mymap);
-mymap.fitBounds(mymap.getBounds());
 
 let getTypesFromDBpedia = (json) => {
     let types = "<br><br><b>types</b><br>";
@@ -160,6 +143,16 @@ const styleCyclingArea = {
     "weight": 5,
     "opacity": 1.0,
     "fillOpacity": 0.8
+};
+
+let addBuffer = () => {
+    // add buffer
+    let tmp = L.circle([lat_mz, lon_mz], {
+        color: "#000",
+        fillOpacity: 0.0,
+        radius: radius_mz_wiki
+    });
+    buffer.addLayer(tmp);
 };
 
 let getWorshipFromLGD = () => {
@@ -330,7 +323,7 @@ let getWikipedia = () => {
     // read valencia data from wikipedia api
     $.ajax({
         type: "GET",
-        url: "https://en.wikipedia.org/w/api.php?action=query&gsmaxdim=10000&list=geosearch&gslimit=1000&gsradius="+radius+"&gscoord="+lat+"|"+lon+"&continue&format=json&origin=*",
+        url: "https://en.wikipedia.org/w/api.php?action=query&gsmaxdim=10000&list=geosearch&gslimit=1000&gsradius="+radius_mz_wiki+"&gscoord="+lat_mz+"|"+lon_mz+"&continue&format=json&origin=*",
         async: false,
         error: function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -356,11 +349,15 @@ let getWikipedia = () => {
 };
 
 $("a[href='#search']").click(function(){
+    // set values
+    lat_mz = $("#lat").val();
+    lon_mz = $("#lon").val();
+    addBuffer();
     // reset layers
     PlaceOfWorship.clearLayers();
     Restaurant.clearLayers();
-    Restaurant.clearLayers();
     BusStation.clearLayers();
+    walkingArea.clearLayers();
     cyclingArea.clearLayers();
     wikipedia.clearLayers();
     // loead layers
@@ -382,4 +379,5 @@ $("a[href='#search']").click(function(){
     if ($("#wikipedia").is(":checked")) {
         getWikipedia();
     }
+    mymap.setView([lat_mz, lon_mz], 11);
 });
