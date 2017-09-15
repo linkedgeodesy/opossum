@@ -162,32 +162,7 @@ const styleCyclingArea = {
     "fillOpacity": 0.8
 };
 
-$("a[href='#sign_up']").click(function(){
-
-    // read valencia data from wikipedia api
-    $.ajax({
-        type: "GET",
-        url: "https://en.wikipedia.org/w/api.php?action=query&gsmaxdim=10000&list=geosearch&gslimit=1000&gsradius="+radius+"&gscoord="+lat+"|"+lon+"&continue&format=json&origin=*",
-        async: false,
-        error: function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
-        },
-        success: function (data) {
-            let geosearch = data.query.geosearch;
-            for (let item in geosearch) {
-                let point = turf.point([geosearch[item].lon, geosearch[item].lat]);
-                let buffer = turf.buffer(point, 20, "meters");
-                let envelope = turf.envelope(buffer);
-                let marker = L.geoJson(envelope, {style: styleValencia});
-                marker.properties = {};
-                marker.properties.wiki = geosearch[item];
-                //marker.bindPopup("<a href='https://en.wikipedia.org/wiki/"+marker.properties.wiki.title+"' target='_blank'>"+marker.properties.wiki.title+"</a>"+getThumbnailFromWikipedia(geosearch[item]));
-                //marker.bindPopup("<a href='https://en.wikipedia.org/wiki/"+marker.properties.wiki.title+"' target='_blank'>"+marker.properties.wiki.title+"</a>"+getTypesFromDBpedia(geosearch[item]));
-                wikipedia.addLayer(marker);
-            }
-        }
-    });
-
+let getWorshipFromLGD = () => {
     // load place of worships via linkedgeodata.org
     $.ajax({
         type: "GET",
@@ -223,7 +198,9 @@ $("a[href='#sign_up']").click(function(){
             }
         }
     });
+}
 
+let getRestaurantFromLGD = () => {
     // load restaurants via linkedgeodata.org
     $.ajax({
         type: "GET",
@@ -259,7 +236,9 @@ $("a[href='#sign_up']").click(function(){
             }
         }
     });
+}
 
+let getBusFromLGD = () => {
     // load busstations via linkedgeodata.org
     $.ajax({
         type: "GET",
@@ -311,7 +290,9 @@ $("a[href='#sign_up']").click(function(){
             }
         }
     });
+};
 
+let getWalkingAreaFromORS = () => {
     // load walking area via openrouteservice.org
     $.ajax({
         type: "GET",
@@ -326,7 +307,9 @@ $("a[href='#sign_up']").click(function(){
             walkingArea.addLayer(marker);
         }
     });
+};
 
+let getCyclingAreaFromORS = () => {
     // load cycling area via openrouteservice.org
     $.ajax({
         type: "GET",
@@ -341,11 +324,62 @@ $("a[href='#sign_up']").click(function(){
             cyclingArea.addLayer(marker);
         }
     });
+};
 
+let getWikipedia = () => {
+    // read valencia data from wikipedia api
+    $.ajax({
+        type: "GET",
+        url: "https://en.wikipedia.org/w/api.php?action=query&gsmaxdim=10000&list=geosearch&gslimit=1000&gsradius="+radius+"&gscoord="+lat+"|"+lon+"&continue&format=json&origin=*",
+        async: false,
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        },
+        success: function (data) {
+            let geosearch = data.query.geosearch;
+            for (let item in geosearch) {
+                let point = turf.point([geosearch[item].lon, geosearch[item].lat]);
+                let buffer = turf.buffer(point, 20, "meters");
+                let envelope = turf.envelope(buffer);
+                let marker = L.geoJson(envelope, {style: styleValencia});
+                marker.properties = {};
+                marker.properties.wiki = geosearch[item];
+                wikipedia.addLayer(marker);
+            }
+        }
+    });
     // set wikipedia popups asynch
-    /*wikipedia.eachLayer(function(layer){
+    wikipedia.eachLayer(function(layer){
         let wikiproperties = layer.properties.wiki;
         layer.bindPopup("<a href='https://en.wikipedia.org/wiki/"+wikiproperties.title+"' target='_blank'>"+wikiproperties.title+"</a>"+getThumbnailFromWikipedia(wikiproperties));
-    });*/
+    });
+};
 
+$("a[href='#search']").click(function(){
+    // reset layers
+    PlaceOfWorship.clearLayers();
+    Restaurant.clearLayers();
+    Restaurant.clearLayers();
+    BusStation.clearLayers();
+    cyclingArea.clearLayers();
+    wikipedia.clearLayers();
+    // loead layers
+    if ($("#worship").is(":checked")) {
+        getWorshipFromLGD();
+    }
+    if ($("#restaurant").is(":checked")) {
+        getRestaurantFromLGD();
+    }
+    if ($("#bus").is(":checked")) {
+        getBusFromLGD();
+    }
+    if ($("#walkingarea").is(":checked")) {
+        getWalkingAreaFromORS();
+    }
+    if ($("#cyclingarea").is(":checked")) {
+        getCyclingAreaFromORS();
+    }
+    if ($("#wikipedia").is(":checked")) {
+        getWikipedia();
+    }
 });
