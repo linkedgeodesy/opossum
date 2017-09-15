@@ -164,7 +164,6 @@ const styleCyclingArea = {
 
 $("a[href='#sign_up']").click(function(){
 
-    $("#action").html("load wikipedia");
     // read valencia data from wikipedia api
     $.ajax({
         type: "GET",
@@ -189,7 +188,6 @@ $("a[href='#sign_up']").click(function(){
         }
     });
 
-    $("#action").html("load worships");
     // load place of worships via linkedgeodata.org
     $.ajax({
         type: "GET",
@@ -226,7 +224,6 @@ $("a[href='#sign_up']").click(function(){
         }
     });
 
-    $("#action").html("load restaurants");
     // load restaurants via linkedgeodata.org
     $.ajax({
         type: "GET",
@@ -263,7 +260,6 @@ $("a[href='#sign_up']").click(function(){
         }
     });
 
-    $("#action").html("load bus stations");
     // load busstations via linkedgeodata.org
     $.ajax({
         type: "GET",
@@ -316,7 +312,6 @@ $("a[href='#sign_up']").click(function(){
         }
     });
 
-    $("#action").html("load walking area");
     // load waking area via openrouteservice.org
     $.ajax({
         type: "GET",
@@ -332,7 +327,6 @@ $("a[href='#sign_up']").click(function(){
         }
     });
 
-    $("#action").html("load cycling area");
     // load cycling area via openrouteservice.org
     $.ajax({
         type: "GET",
@@ -348,7 +342,6 @@ $("a[href='#sign_up']").click(function(){
         }
     });
 
-    $("#action").html("load wikipedia popups");
     // set wikipedia popups asynch
     /*wikipedia.eachLayer(function(layer){
         let wikiproperties = layer.properties.wiki;
