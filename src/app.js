@@ -88,11 +88,8 @@ function drawControlbar() {
 }
 
 mymap.on("draw:created", function (e) {
-    console.log(e.layer._latlng.lat, e.layer._latlng.lng, e);
-    /*getMarkergeoJSON(e.layer._latlng.lat, e.layer._latlng.lng, e);
-    setTimeout(function () {
-        mymap.setView([e.layer._latlng.lat, e.layer._latlng.lng], 11);
-    }, 1);*/
+    $("#lat").val(e.layer._latlng.lat.toFixed(5));
+    $("#lon").val(e.layer._latlng.lng.toFixed(5));
 });
 
 drawControlbar();
@@ -432,7 +429,7 @@ $("a[href='#search']").click(function(){
     cyclingArea.clearLayers();
     wikipedia.clearLayers();
     // load layers
-    if (lat_mz > 0 && lon_mz > 0 && type !== "" && time > 0) {
+    if (lat_mz !== "" && lon_mz !== "" && type !== "" && time > 0) {
         if (type==="walking") {
             getWalkingAreaFromORS();
         } else if (type==="cycling") {
