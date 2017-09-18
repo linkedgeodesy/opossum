@@ -10,7 +10,6 @@ let ors_key = "58d904a497c67e00015b45fcd2e10661dfa14f2d46c679d259b00197";
 let lat_mz = -1;
 let lon_mz = -1;
 let radius_mz = 10;
-let radius_mz_wiki = radius_mz*1000;
 let lgdtype = "PlaceOfWorship"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
 let lgdtype2 = "Restaurant"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
 let lgdtype3 = "Amenity"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
@@ -106,6 +105,13 @@ let getThumbnailFromWikipedia = (json) => {
     return thumbnail_img;
 };
 
+const styleBuffer = {
+    "color": "black",
+    "weight": 3,
+    "opacity": 1.0,
+    "fillOpacity": 0.0
+};
+
 const styleValencia = {
     "color": "#0000FF",
     "weight": 5,
@@ -148,13 +154,8 @@ const styleCyclingArea = {
     "fillOpacity": 0.8
 };
 
-let addBuffer = (lat,lon,radius) => {
-    // add buffer
-    let tmp = L.circle([lat, lon], {
-        color: "#000",
-        fillOpacity: 0.0,
-        radius: radius
-    });
+let addBufferPolygon = (envelope) => {
+    let tmp = L.geoJSON(envelope, {style: styleBuffer});
     buffer.addLayer(tmp);
 };
 
@@ -312,7 +313,7 @@ let getWalkingAreaFromORS = () => {
             } else {
                 calculated_buffer_length = dist2/2;
             }
-            addBuffer(lat_mz,lon_mz,calculated_buffer_length);
+            addBufferPolygon(envelope);
             calculated_buffer_length = calculated_buffer_length/1000;
             marker.bindPopup("walking "+(time/60)+" minutes");
             walkingArea.addLayer(marker);
@@ -344,7 +345,7 @@ let getCyclingAreaFromORS = () => {
             } else {
                 calculated_buffer_length = dist2/2;
             }
-            addBuffer(lat_mz,lon_mz,calculated_buffer_length);
+            addBufferPolygon(envelope);
             calculated_buffer_length = calculated_buffer_length/1000;
             marker.bindPopup("walking "+(time/60)+" minutes");
             cyclingArea.addLayer(marker);
