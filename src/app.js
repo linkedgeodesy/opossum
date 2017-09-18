@@ -13,7 +13,7 @@ let radius_mz = 10;
 let radius_mz_wiki = radius_mz*1000;
 let lgdtype = "PlaceOfWorship"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
 let lgdtype2 = "Restaurant"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
-let lgdtype3 = "PublicTransportThing"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
+let lgdtype3 = "Amenity"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
 let range_mz_min = 25;
 let range_mz = range_mz_min*60;
 
@@ -265,7 +265,7 @@ let getBusFromLGD = () => {
                     let polygon = turf.polygon(coord_gj);
                     let centroid = turf.centroid(polygon);
                     // create buffer
-                    let point = turf.point([lon_mz, lat_mz]);
+                    let point = turf.point([Number(lon_mz), Number(lat_mz)]);
                     let buffered = turf.buffer(point, radius_mz, "kilometers");
                     // is point in buffer?
                     let inside = turf.inside(centroid, buffered);
