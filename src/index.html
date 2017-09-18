@@ -22,33 +22,35 @@
                         <img src="data/opossum.png" height="100"><br><h3>opossum</h3>
                     </div>
                 </div>
-                <div class="input-field col s12">
+                <div class="input-field col s6">
                     <input placeholder="50.0" id="lat" type="text" class="validate" value="50.0">
-                    <label for="lat">lat</label>
+                    <label for="lat">center latitude</label>
                 </div>
-                <div class="input-field col s12">
+                <div class="input-field col s6">
                     <input placeholder="8.271111" id="lon" type="text" class="validate" value="8.271111">
-                    <label for="lon">lon</label>
+                    <label for="lon">center longitude</label>
                 </div>
-                <div class="input-field col s12">
+                <div class="input-field col s6">
                     <select id="type">
-                        <option value="" disabled selected>choose type</option>
+                        <option value="" disabled selected>set type</option>
                         <option value="walking">walking area</option>
                         <option value="cycling">cycling area</option>
                     </select>
                     <label>search area</label>
                 </div>
-                <div class="input-field col s12">
+                <div class="input-field col s6">
                     <select id="time">
-                        <option value="" disabled selected>choose type</option>
+                        <option value="" disabled selected>set time</option>
                         <option value="5">5 min</option>
                         <option value="10">10 min</option>
+                        <option value="15">15 min</option>
+                        <option value="20">20 min</option>
                     </select>
-                    <label>choose time</label>
+                    <label>time</label>
                 </div>
                 <div class="col s12">
                     <p>
-                      <input type="checkbox" class="filled-in" id="worship" checked="checked" />
+                      <input type="checkbox" class="filled-in" id="worship" />
                       <label for="worship">Place of Worship</label>
                     </p>
                     <p>
@@ -58,14 +60,6 @@
                     <p>
                       <input type="checkbox" class="filled-in" id="bus" />
                       <label for="bus">Amenity</label>
-                    </p>
-                    <p>
-                      <input type="checkbox" class="filled-in" id="walkingarea" />
-                      <label for="walkingarea">Walking Area</label>
-                    </p>
-                    <p>
-                      <input type="checkbox" class="filled-in" id="cyclingarea" />
-                      <label for="cyclingarea">Cycling Area</label>
                     </p>
                     <p>
                       <input type="checkbox" class="filled-in" id="wikipedia" />

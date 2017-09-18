@@ -14,10 +14,9 @@ let radius_mz_wiki = radius_mz*1000;
 let lgdtype = "PlaceOfWorship"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
 let lgdtype2 = "Restaurant"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
 let lgdtype3 = "Amenity"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
-let range_mz_min = 25;
-let range_mz = range_mz_min*60;
+let time = -1;
 let type = "";
-let time = "";
+let calculated_buffer_length = 0;
 
 $("select").material_select();
 
@@ -143,18 +142,18 @@ const styleWalkingArea = {
 };
 
 const styleCyclingArea = {
-    "color": "lightblue",
+    "color": "grey",
     "weight": 5,
     "opacity": 1.0,
     "fillOpacity": 0.8
 };
 
-let addBuffer = () => {
+let addBuffer = (lat,lon,radius) => {
     // add buffer
-    let tmp = L.circle([lat_mz, lon_mz], {
+    let tmp = L.circle([lat, lon], {
         color: "#000",
         fillOpacity: 0.0,
-        radius: radius_mz_wiki
+        radius: radius
     });
     buffer.addLayer(tmp);
 };
@@ -163,7 +162,7 @@ let getWorshipFromLGD = () => {
     // load place of worships via linkedgeodata.org
     $.ajax({
         type: "GET",
-        url: "http://linkedgeodata.org/sparql?default-graph-uri=http%3A%2F%2Flinkedgeodata.org&query=Prefix+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APrefix+ogc%3A+%3Chttp%3A%2F%2Fwww.opengis.net%2Font%2Fgeosparql%23%3E%0D%0APrefix+geom%3A+%3Chttp%3A%2F%2Fgeovocab.org%2Fgeometry%23%3E%0D%0APrefix+lgdo%3A+%3Chttp%3A%2F%2Flinkedgeodata.org%2Fontology%2F%3E%0D%0A%0D%0ASelect+%3Fitem+%3Flabel+%3Fgeo%0D%0AFrom+%3Chttp%3A%2F%2Flinkedgeodata.org%3E+%7B%0D%0A++%3Fitem%0D%0A++++a+lgdo%3A"+lgdtype+"+%3B%0D%0A++++rdfs%3Alabel+%3Flabel+%3B%0D%0A++++geom%3Ageometry+%5B%0D%0A++++++ogc%3AasWKT+%3Fgeo%0D%0A++++%5D+.%0D%0A+++%0D%0A++Filter+%28%0D%0A++++bif%3Ast_intersects+%28%3Fgeo%2C+bif%3Ast_point+%28"+lon_mz+"%2C+"+lat_mz+"%29%2C+"+radius_mz+"%29%0D%0A++%29+.%0D%0A%7D&format=application%2Fsparql-results%2Bjson&timeout=0&debug=on",
+        url: "http://linkedgeodata.org/sparql?default-graph-uri=http%3A%2F%2Flinkedgeodata.org&query=Prefix+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APrefix+ogc%3A+%3Chttp%3A%2F%2Fwww.opengis.net%2Font%2Fgeosparql%23%3E%0D%0APrefix+geom%3A+%3Chttp%3A%2F%2Fgeovocab.org%2Fgeometry%23%3E%0D%0APrefix+lgdo%3A+%3Chttp%3A%2F%2Flinkedgeodata.org%2Fontology%2F%3E%0D%0A%0D%0ASelect+%3Fitem+%3Flabel+%3Fgeo%0D%0AFrom+%3Chttp%3A%2F%2Flinkedgeodata.org%3E+%7B%0D%0A++%3Fitem%0D%0A++++a+lgdo%3A"+lgdtype+"+%3B%0D%0A++++rdfs%3Alabel+%3Flabel+%3B%0D%0A++++geom%3Ageometry+%5B%0D%0A++++++ogc%3AasWKT+%3Fgeo%0D%0A++++%5D+.%0D%0A+++%0D%0A++Filter+%28%0D%0A++++bif%3Ast_intersects+%28%3Fgeo%2C+bif%3Ast_point+%28"+lon_mz+"%2C+"+lat_mz+"%29%2C+"+calculated_buffer_length+"%29%0D%0A++%29+.%0D%0A%7D&format=application%2Fsparql-results%2Bjson&timeout=0&debug=on",
         async: false,
         error: function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -201,7 +200,7 @@ let getRestaurantFromLGD = () => {
     // load restaurants via linkedgeodata.org
     $.ajax({
         type: "GET",
-        url: "http://linkedgeodata.org/sparql?default-graph-uri=http%3A%2F%2Flinkedgeodata.org&query=Prefix+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APrefix+ogc%3A+%3Chttp%3A%2F%2Fwww.opengis.net%2Font%2Fgeosparql%23%3E%0D%0APrefix+geom%3A+%3Chttp%3A%2F%2Fgeovocab.org%2Fgeometry%23%3E%0D%0APrefix+lgdo%3A+%3Chttp%3A%2F%2Flinkedgeodata.org%2Fontology%2F%3E%0D%0A%0D%0ASelect+%3Fitem+%3Flabel+%3Fgeo%0D%0AFrom+%3Chttp%3A%2F%2Flinkedgeodata.org%3E+%7B%0D%0A++%3Fitem%0D%0A++++a+lgdo%3A"+lgdtype2+"+%3B%0D%0A++++rdfs%3Alabel+%3Flabel+%3B%0D%0A++++geom%3Ageometry+%5B%0D%0A++++++ogc%3AasWKT+%3Fgeo%0D%0A++++%5D+.%0D%0A+++%0D%0A++Filter+%28%0D%0A++++bif%3Ast_intersects+%28%3Fgeo%2C+bif%3Ast_point+%28"+lon_mz+"%2C+"+lat_mz+"%29%2C+"+radius_mz+"%29%0D%0A++%29+.%0D%0A%7D&format=application%2Fsparql-results%2Bjson&timeout=0&debug=on",
+        url: "http://linkedgeodata.org/sparql?default-graph-uri=http%3A%2F%2Flinkedgeodata.org&query=Prefix+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APrefix+ogc%3A+%3Chttp%3A%2F%2Fwww.opengis.net%2Font%2Fgeosparql%23%3E%0D%0APrefix+geom%3A+%3Chttp%3A%2F%2Fgeovocab.org%2Fgeometry%23%3E%0D%0APrefix+lgdo%3A+%3Chttp%3A%2F%2Flinkedgeodata.org%2Fontology%2F%3E%0D%0A%0D%0ASelect+%3Fitem+%3Flabel+%3Fgeo%0D%0AFrom+%3Chttp%3A%2F%2Flinkedgeodata.org%3E+%7B%0D%0A++%3Fitem%0D%0A++++a+lgdo%3A"+lgdtype2+"+%3B%0D%0A++++rdfs%3Alabel+%3Flabel+%3B%0D%0A++++geom%3Ageometry+%5B%0D%0A++++++ogc%3AasWKT+%3Fgeo%0D%0A++++%5D+.%0D%0A+++%0D%0A++Filter+%28%0D%0A++++bif%3Ast_intersects+%28%3Fgeo%2C+bif%3Ast_point+%28"+lon_mz+"%2C+"+lat_mz+"%29%2C+"+calculated_buffer_length+"%29%0D%0A++%29+.%0D%0A%7D&format=application%2Fsparql-results%2Bjson&timeout=0&debug=on",
         async: false,
         error: function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -239,7 +238,7 @@ let getBusFromLGD = () => {
     // load busstations via linkedgeodata.org
     $.ajax({
         type: "GET",
-        url: "http://linkedgeodata.org/sparql?default-graph-uri=http%3A%2F%2Flinkedgeodata.org&query=Prefix+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APrefix+ogc%3A+%3Chttp%3A%2F%2Fwww.opengis.net%2Font%2Fgeosparql%23%3E%0D%0APrefix+geom%3A+%3Chttp%3A%2F%2Fgeovocab.org%2Fgeometry%23%3E%0D%0APrefix+lgdo%3A+%3Chttp%3A%2F%2Flinkedgeodata.org%2Fontology%2F%3E%0D%0A%0D%0ASelect+%3Fitem+%3Flabel+%3Fgeo%0D%0AFrom+%3Chttp%3A%2F%2Flinkedgeodata.org%3E+%7B%0D%0A++%3Fitem%0D%0A++++a+lgdo%3A"+lgdtype3+"+%3B%0D%0A++++rdfs%3Alabel+%3Flabel+%3B%0D%0A++++geom%3Ageometry+%5B%0D%0A++++++ogc%3AasWKT+%3Fgeo%0D%0A++++%5D+.%0D%0A+++%0D%0A++Filter+%28%0D%0A++++bif%3Ast_intersects+%28%3Fgeo%2C+bif%3Ast_point+%28"+lon_mz+"%2C+"+lat_mz+"%29%2C+"+radius_mz+"%29%0D%0A++%29+.%0D%0A%7D&format=application%2Fsparql-results%2Bjson&timeout=0&debug=on",
+        url: "http://linkedgeodata.org/sparql?default-graph-uri=http%3A%2F%2Flinkedgeodata.org&query=Prefix+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APrefix+ogc%3A+%3Chttp%3A%2F%2Fwww.opengis.net%2Font%2Fgeosparql%23%3E%0D%0APrefix+geom%3A+%3Chttp%3A%2F%2Fgeovocab.org%2Fgeometry%23%3E%0D%0APrefix+lgdo%3A+%3Chttp%3A%2F%2Flinkedgeodata.org%2Fontology%2F%3E%0D%0A%0D%0ASelect+%3Fitem+%3Flabel+%3Fgeo%0D%0AFrom+%3Chttp%3A%2F%2Flinkedgeodata.org%3E+%7B%0D%0A++%3Fitem%0D%0A++++a+lgdo%3A"+lgdtype3+"+%3B%0D%0A++++rdfs%3Alabel+%3Flabel+%3B%0D%0A++++geom%3Ageometry+%5B%0D%0A++++++ogc%3AasWKT+%3Fgeo%0D%0A++++%5D+.%0D%0A+++%0D%0A++Filter+%28%0D%0A++++bif%3Ast_intersects+%28%3Fgeo%2C+bif%3Ast_point+%28"+lon_mz+"%2C+"+lat_mz+"%29%2C+"+calculated_buffer_length+"%29%0D%0A++%29+.%0D%0A%7D&format=application%2Fsparql-results%2Bjson&timeout=0&debug=on",
         async: false,
         error: function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -293,14 +292,29 @@ let getWalkingAreaFromORS = () => {
     // load walking area via openrouteservice.org
     $.ajax({
         type: "GET",
-        url: "https://api.openrouteservice.org/isochrones?locations="+lon_mz+"%2C"+lat_mz+"&profile=foot-walking&range_type=time&range="+range_mz+"&location_type=start&api_key="+ors_key,
+        url: "https://api.openrouteservice.org/isochrones?locations="+lon_mz+"%2C"+lat_mz+"&profile=foot-walking&range_type=time&range="+time+"&location_type=start&api_key="+ors_key,
         async: false,
         error: function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
         },
         success: function (data) {
             let marker = L.geoJson(data, {style: styleWalkingArea});
-            marker.bindPopup("walking 25 minutes");
+            let polygon = turf.polygon(data.features[0].geometry.coordinates);
+            let envelope = turf.envelope(polygon);
+            let coords = turf.getCoords(envelope);
+            let p1 = turf.point(coords[0][0]);
+            let p2 = turf.point(coords[0][2]);
+            let p3 = turf.point(coords[0][3]);
+            let dist1 = Number(turf.distance(p1, p2, "meters"));
+            let dist2 = Number(turf.distance(p2, p3, "meters"));
+            if (dist1 > dist2) {
+                calculated_buffer_length = dist1/2;
+            } else {
+                calculated_buffer_length = dist2/2;
+            }
+            addBuffer(lat_mz,lon_mz,calculated_buffer_length);
+            calculated_buffer_length = calculated_buffer_length/1000;
+            marker.bindPopup("walking "+(time/60)+" minutes");
             walkingArea.addLayer(marker);
         }
     });
@@ -310,14 +324,29 @@ let getCyclingAreaFromORS = () => {
     // load cycling area via openrouteservice.org
     $.ajax({
         type: "GET",
-        url: "https://api.openrouteservice.org/isochrones?locations="+lon_mz+"%2C"+lat_mz+"&profile=cycling-regular&range_type=time&range="+range_mz+"&location_type=start&api_key="+ors_key,
+        url: "https://api.openrouteservice.org/isochrones?locations="+lon_mz+"%2C"+lat_mz+"&profile=cycling-regular&range_type=time&range="+time+"&location_type=start&api_key="+ors_key,
         async: false,
         error: function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
         },
         success: function (data) {
             let marker = L.geoJson(data, {style: styleCyclingArea});
-            marker.bindPopup("cycling 25 minutes");
+            let polygon = turf.polygon(data.features[0].geometry.coordinates);
+            let envelope = turf.envelope(polygon);
+            let coords = turf.getCoords(envelope);
+            let p1 = turf.point(coords[0][0]);
+            let p2 = turf.point(coords[0][2]);
+            let p3 = turf.point(coords[0][3]);
+            let dist1 = Number(turf.distance(p1, p2, "meters"));
+            let dist2 = Number(turf.distance(p2, p3, "meters"));
+            if (dist1 > dist2) {
+                calculated_buffer_length = dist1/2;
+            } else {
+                calculated_buffer_length = dist2/2;
+            }
+            addBuffer(lat_mz,lon_mz,calculated_buffer_length);
+            calculated_buffer_length = calculated_buffer_length/1000;
+            marker.bindPopup("walking "+(time/60)+" minutes");
             cyclingArea.addLayer(marker);
         }
     });
@@ -327,7 +356,7 @@ let getWikipedia = () => {
     // read valencia data from wikipedia api
     $.ajax({
         type: "GET",
-        url: "https://en.wikipedia.org/w/api.php?action=query&gsmaxdim=10000&list=geosearch&gslimit=1000&gsradius="+radius_mz_wiki+"&gscoord="+lat_mz+"|"+lon_mz+"&continue&format=json&origin=*",
+        url: "https://en.wikipedia.org/w/api.php?action=query&gsmaxdim=10000&list=geosearch&gslimit=1000&gsradius="+(calculated_buffer_length*1000)+"&gscoord="+lat_mz+"|"+lon_mz+"&continue&format=json&origin=*",
         async: false,
         error: function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -356,10 +385,10 @@ $("a[href='#search']").click(function(){
     // set values
     lat_mz = Number($("#lat").val());
     lon_mz = Number($("#lon").val());
-    addBuffer();
     type = $("#type option:selected").val();
-    time = Number($("#time option:selected").val());
+    time = Number($("#time option:selected").val()*60);
     // reset layers
+    buffer.clearLayers();
     PlaceOfWorship.clearLayers();
     Restaurant.clearLayers();
     BusStation.clearLayers();
@@ -368,6 +397,11 @@ $("a[href='#search']").click(function(){
     wikipedia.clearLayers();
     // load layers
     if (lat_mz > 0 && lon_mz > 0 && type !== "" && time > 0) {
+        if (type==="walking") {
+            getWalkingAreaFromORS();
+        } else if (type==="cycling") {
+            getCyclingAreaFromORS();
+        }
         if ($("#worship").is(":checked")) {
             getWorshipFromLGD();
         }
@@ -377,16 +411,10 @@ $("a[href='#search']").click(function(){
         if ($("#bus").is(":checked")) {
             getBusFromLGD();
         }
-        if ($("#walkingarea").is(":checked")) {
-            getWalkingAreaFromORS();
-        }
-        if ($("#cyclingarea").is(":checked")) {
-            getCyclingAreaFromORS();
-        }
         if ($("#wikipedia").is(":checked")) {
             getWikipedia();
         }
-        mymap.setView([lat_mz, lon_mz], 11);
+        mymap.setView([lat_mz, lon_mz], 13);
     } else {
         alert("no input value");
     }
