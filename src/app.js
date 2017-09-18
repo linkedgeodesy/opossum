@@ -4,6 +4,7 @@ import * as L from "leaflet";
 import * as wellknown from "wellknown";
 import * as turf from "@turf/turf";
 import "materialize-css";
+import "leaflet-draw";
 
 let ors_key = "58d904a497c67e00015b45fcd2e10661dfa14f2d46c679d259b00197";
 
@@ -61,6 +62,40 @@ const overlays ={
 };
 
 L.control.layers(baseMaps, overlays).addTo(mymap);
+
+var drawControl;
+var drawnItems = new L.FeatureGroup();
+L.drawLocal.draw.toolbar.buttons.rectangle = "Draw a boundingbox for selection";
+L.drawLocal.draw.toolbar.buttons.marker = "Select a point";
+function drawControlbar() {
+    drawControl = new L.Control.Draw({
+        position: "topleft",
+        draw: {
+            polyline: false,
+            polygon: false,
+            circle: false,
+            marker: true,
+            rectangle: false,
+            circlemarker: false
+        },
+        edit: {
+            featureGroup: drawnItems,
+            remove: false,
+            edit: false
+        }
+    });
+    mymap.addControl(drawControl);
+}
+
+mymap.on("draw:created", function (e) {
+    console.log(e.layer._latlng.lat, e.layer._latlng.lng, e);
+    /*getMarkergeoJSON(e.layer._latlng.lat, e.layer._latlng.lng, e);
+    setTimeout(function () {
+        mymap.setView([e.layer._latlng.lat, e.layer._latlng.lng], 11);
+    }, 1);*/
+});
+
+drawControlbar();
 
 let getTypesFromDBpedia = (json) => {
     let types = "<br><br><b>types</b><br>";
