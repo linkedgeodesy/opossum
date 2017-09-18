@@ -16,6 +16,10 @@ let lgdtype2 = "Restaurant"; //Museum School PlaceOfWorship Restaurant BusStatio
 let lgdtype3 = "Amenity"; //Museum School PlaceOfWorship Restaurant BusStation PublicTransportThing
 let range_mz_min = 25;
 let range_mz = range_mz_min*60;
+let type = "";
+let time = "";
+
+$("select").material_select();
 
 // set tile layer
 const hotMap = L.tileLayer("http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
@@ -353,6 +357,8 @@ $("a[href='#search']").click(function(){
     lat_mz = $("#lat").val();
     lon_mz = $("#lon").val();
     addBuffer();
+    type = $("#type option:selected").val();
+    time = $("#time option:selected").val();
     // reset layers
     PlaceOfWorship.clearLayers();
     Restaurant.clearLayers();
