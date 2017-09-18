@@ -354,11 +354,11 @@ let getWikipedia = () => {
 
 $("a[href='#search']").click(function(){
     // set values
-    lat_mz = $("#lat").val();
-    lon_mz = $("#lon").val();
+    lat_mz = Number($("#lat").val());
+    lon_mz = Number($("#lon").val());
     addBuffer();
     type = $("#type option:selected").val();
-    time = $("#time option:selected").val();
+    time = Number($("#time option:selected").val());
     // reset layers
     PlaceOfWorship.clearLayers();
     Restaurant.clearLayers();
@@ -366,24 +366,29 @@ $("a[href='#search']").click(function(){
     walkingArea.clearLayers();
     cyclingArea.clearLayers();
     wikipedia.clearLayers();
-    // loead layers
-    if ($("#worship").is(":checked")) {
-        getWorshipFromLGD();
+    // load layers
+    if (lat_mz > 0 && lon_mz > 0 && type !== "" && time > 0) {
+        if ($("#worship").is(":checked")) {
+            getWorshipFromLGD();
+        }
+        if ($("#restaurant").is(":checked")) {
+            getRestaurantFromLGD();
+        }
+        if ($("#bus").is(":checked")) {
+            getBusFromLGD();
+        }
+        if ($("#walkingarea").is(":checked")) {
+            getWalkingAreaFromORS();
+        }
+        if ($("#cyclingarea").is(":checked")) {
+            getCyclingAreaFromORS();
+        }
+        if ($("#wikipedia").is(":checked")) {
+            getWikipedia();
+        }
+        mymap.setView([lat_mz, lon_mz], 11);
+    } else {
+        alert("no input value");
     }
-    if ($("#restaurant").is(":checked")) {
-        getRestaurantFromLGD();
-    }
-    if ($("#bus").is(":checked")) {
-        getBusFromLGD();
-    }
-    if ($("#walkingarea").is(":checked")) {
-        getWalkingAreaFromORS();
-    }
-    if ($("#cyclingarea").is(":checked")) {
-        getCyclingAreaFromORS();
-    }
-    if ($("#wikipedia").is(":checked")) {
-        getWikipedia();
-    }
-    mymap.setView([lat_mz, lon_mz], 11);
+
 });
