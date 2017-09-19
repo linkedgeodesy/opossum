@@ -54,7 +54,6 @@ const baseMaps = {
 };
 
 const overlays ={
-    "Center": center,
     "Wikipedia": wikipedia,
     "LGD PlaceOfWorship": PlaceOfWorship,
     "LGD Restaurant": Restaurant,
@@ -94,7 +93,7 @@ mymap.on("draw:created", function (e) {
     $("#lon").val(e.layer._latlng.lng.toFixed(5));
     center.clearLayers();
     addCenter(e.layer._latlng.lat.toFixed(5),e.layer._latlng.lng.toFixed(5));
-    mymap.setView([e.layer._latlng.lat.toFixed(5), e.layer._latlng.lng.toFixed(5)], 13);
+    mymap.setView([e.layer._latlng.lat.toFixed(5), e.layer._latlng.lng.toFixed(5)], 15);
 });
 
 drawControlbar();
@@ -209,7 +208,7 @@ let addCenter = (lat, lon) => {
     let tmp = L.circle([lat, lon], {
         color: "red",
         fillOpacity: 0.0,
-        radius: 5
+        radius: 50
     });
     center.addLayer(tmp);
 };
