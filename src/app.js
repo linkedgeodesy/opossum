@@ -107,6 +107,11 @@ let isInside = (geojson, polygonGeom) => {
     return inside;
 };
 
+let isInsideWiki = (geojson, polygonGeom) => {
+    let inside = turf.inside(geojson, polygonGeom);
+    return inside;
+};
+
 let getTypesFromDBpedia = (json) => {
     let types = "<br><br><b>types</b><br>";
     $.ajax({
@@ -417,12 +422,14 @@ let getWikipedia = () => {
             let geosearch = data.query.geosearch;
             for (let item in geosearch) {
                 let point = turf.point([geosearch[item].lon, geosearch[item].lat]);
-                let buffer = turf.buffer(point, 20, "meters");
-                let envelope = turf.envelope(buffer);
-                let marker = L.geoJson(envelope, {style: styleValencia});
-                marker.properties = {};
-                marker.properties.wiki = geosearch[item];
-                wikipedia.addLayer(marker);
+                if (isInsideWiki(point,area)) {
+                    let buffer = turf.buffer(point, 20, "meters");
+                    let envelope = turf.envelope(buffer);
+                    let marker = L.geoJson(envelope, {style: styleValencia});
+                    marker.properties = {};
+                    marker.properties.wiki = geosearch[item];
+                    wikipedia.addLayer(marker);
+                }
             }
         }
     });
