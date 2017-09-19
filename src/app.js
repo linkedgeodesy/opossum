@@ -45,7 +45,7 @@ let center = L.layerGroup();
 const mymap = L.map("mapid", {
     center: [45.5, 4.8],
     zoom: 5,
-    layers: [osmMap, buffer, center, wikipedia, cyclingArea, walkingArea, PlaceOfWorship, Restaurant, BusStation]
+    layers: [osmMap, center, wikipedia, cyclingArea, walkingArea, PlaceOfWorship, Restaurant, BusStation]
 });
 
 const baseMaps = {
@@ -54,7 +54,6 @@ const baseMaps = {
 };
 
 const overlays ={
-    "Buffer": buffer,
     "Center": center,
     "Wikipedia": wikipedia,
     "LGD PlaceOfWorship": PlaceOfWorship,
@@ -188,14 +187,14 @@ const styleBus = {
 };
 
 const styleWalkingArea = {
-    "color": "grey",
+    "color": "red",
     "weight": 5,
     "opacity": 1.0,
     "fillOpacity": 0
 };
 
 const styleCyclingArea = {
-    "color": "grey",
+    "color": "red",
     "weight": 5,
     "opacity": 1.0,
     "fillOpacity": 0
