@@ -17,6 +17,7 @@ let lgdtype3 = "Amenity"; //Museum School PlaceOfWorship Restaurant BusStation P
 let time = -1;
 let type = "";
 let calculated_buffer_length = 0;
+let area;
 
 $("select").material_select();
 
@@ -98,6 +99,15 @@ mymap.on("draw:created", function (e) {
 });
 
 drawControlbar();
+
+let isInside = (geojson, polygonGeom) => {
+    let coord_gj = turf.getCoords(geojson);
+    let polygon = turf.polygon(coord_gj);
+    let centroid = turf.centroid(polygon);
+    // is point in polygonGeom?
+    let inside = turf.inside(centroid, polygonGeom);
+    return inside;
+};
 
 let getTypesFromDBpedia = (json) => {
     let types = "<br><br><b>types</b><br>";
@@ -232,16 +242,18 @@ let getWorshipFromLGD = () => {
                     let envelope = turf.envelope(buffer);
                     geojson = envelope;
                 }
-                let marker = L.geoJson(geojson, {style: stylePlaceOfWorship});
-                marker.properties = {};
-                marker.properties.item = bindings[item].item.value;
-                marker.properties.label = bindings[item].label.value;
-                marker.bindPopup("<i class='fa fa-bell' aria-hidden='true'></i><br><br>"+marker.properties.label);
-                PlaceOfWorship.addLayer(marker);
+                if (isInside(geojson,area)) {
+                    let marker = L.geoJson(geojson, {style: stylePlaceOfWorship});
+                    marker.properties = {};
+                    marker.properties.item = bindings[item].item.value;
+                    marker.properties.label = bindings[item].label.value;
+                    marker.bindPopup("<i class='fa fa-bell' aria-hidden='true'></i><br><br>"+marker.properties.label);
+                    PlaceOfWorship.addLayer(marker);
+                }
             }
         }
     });
-}
+};
 
 let getRestaurantFromLGD = () => {
     // load restaurants via linkedgeodata.org
@@ -270,16 +282,18 @@ let getRestaurantFromLGD = () => {
                     let envelope = turf.envelope(buffer);
                     geojson = envelope;
                 }
-                let marker = L.geoJson(geojson, {style: styleRestaurant});
-                marker.properties = {};
-                marker.properties.item = bindings[item].item.value;
-                marker.properties.label = bindings[item].label.value;
-                marker.bindPopup("<i class='fa fa-glass' aria-hidden='true'></i><br><br>"+marker.properties.label);
-                Restaurant.addLayer(marker);
+                if (isInside(geojson,area)) {
+                    let marker = L.geoJson(geojson, {style: styleRestaurant});
+                    marker.properties = {};
+                    marker.properties.item = bindings[item].item.value;
+                    marker.properties.label = bindings[item].label.value;
+                    marker.bindPopup("<i class='fa fa-glass' aria-hidden='true'></i><br><br>"+marker.properties.label);
+                    Restaurant.addLayer(marker);
+                }
             }
         }
     });
-}
+};
 
 let getBusFromLGD = () => {
     // load busstations via linkedgeodata.org
@@ -310,16 +324,7 @@ let getBusFromLGD = () => {
                     } else {
                         //console.log(bindings[item]);
                     }
-                    // create centroind from geom
-                    let coord_gj = turf.getCoords(geojson);
-                    let polygon = turf.polygon(coord_gj);
-                    let centroid = turf.centroid(polygon);
-                    // create buffer
-                    let point = turf.point([Number(lon_mz), Number(lat_mz)]);
-                    let buffered = turf.buffer(point, radius_mz, "kilometers");
-                    // is point in buffer?
-                    let inside = turf.inside(centroid, buffered);
-                    if (inside) {
+                    if (isInside(geojson,area)) {
                         let marker = L.geoJson(geojson, {style: styleBus});
                         marker.properties = {};
                         marker.properties.item = bindings[item].item.value;
@@ -347,6 +352,7 @@ let getWalkingAreaFromORS = () => {
         success: function (data) {
             let marker = L.geoJson(data, {style: styleWalkingArea});
             let polygon = turf.polygon(data.features[0].geometry.coordinates);
+            area = polygon;
             let envelope = turf.envelope(polygon);
             let coords = turf.getCoords(envelope);
             let p1 = turf.point(coords[0][0]);
@@ -379,6 +385,7 @@ let getCyclingAreaFromORS = () => {
         success: function (data) {
             let marker = L.geoJson(data, {style: styleCyclingArea});
             let polygon = turf.polygon(data.features[0].geometry.coordinates);
+            area = polygon;
             let envelope = turf.envelope(polygon);
             let coords = turf.getCoords(envelope);
             let p1 = turf.point(coords[0][0]);
