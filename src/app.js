@@ -38,12 +38,13 @@ let Restaurant = L.layerGroup();
 let BusStation = L.layerGroup();
 let walkingArea = L.layerGroup();
 let cyclingArea = L.layerGroup();
+let center = L.layerGroup();
 
 // init map
 const mymap = L.map("mapid", {
     center: [45.5, 4.8],
     zoom: 5,
-    layers: [osmMap, buffer, wikipedia, cyclingArea, walkingArea, PlaceOfWorship, Restaurant, BusStation]
+    layers: [osmMap, buffer, center, wikipedia, cyclingArea, walkingArea, PlaceOfWorship, Restaurant, BusStation]
 });
 
 const baseMaps = {
@@ -53,6 +54,7 @@ const baseMaps = {
 
 const overlays ={
     "Buffer": buffer,
+    "Center": center,
     "Wikipedia": wikipedia,
     "LGD PlaceOfWorship": PlaceOfWorship,
     "LGD Restaurant": Restaurant,
@@ -90,6 +92,9 @@ function drawControlbar() {
 mymap.on("draw:created", function (e) {
     $("#lat").val(e.layer._latlng.lat.toFixed(5));
     $("#lon").val(e.layer._latlng.lng.toFixed(5));
+    center.clearLayers();
+    addCenter(e.layer._latlng.lat.toFixed(5),e.layer._latlng.lng.toFixed(5));
+    mymap.setView([e.layer._latlng.lat.toFixed(5), e.layer._latlng.lng.toFixed(5)], 13);
 });
 
 drawControlbar();
@@ -176,19 +181,28 @@ const styleWalkingArea = {
     "color": "grey",
     "weight": 5,
     "opacity": 1.0,
-    "fillOpacity": 0.8
+    "fillOpacity": 0
 };
 
 const styleCyclingArea = {
     "color": "grey",
     "weight": 5,
     "opacity": 1.0,
-    "fillOpacity": 0.8
+    "fillOpacity": 0
 };
 
 let addBufferPolygon = (envelope) => {
     let tmp = L.geoJSON(envelope, {style: styleBuffer});
     buffer.addLayer(tmp);
+};
+
+let addCenter = (lat, lon) => {
+    let tmp = L.circle([lat, lon], {
+        color: "red",
+        fillOpacity: 0.0,
+        radius: 5
+    });
+    center.addLayer(tmp);
 };
 
 let getWorshipFromLGD = () => {
@@ -428,6 +442,7 @@ $("a[href='#search']").click(function(){
     walkingArea.clearLayers();
     cyclingArea.clearLayers();
     wikipedia.clearLayers();
+    center.clearLayers();
     // load layers
     if (lat_mz !== "" && lon_mz !== "" && type !== "" && time > 0) {
         if (type==="walking") {
