@@ -58,8 +58,8 @@ const overlays ={
     "LGD PlaceOfWorship": PlaceOfWorship,
     "LGD Restaurant": Restaurant,
     "LGD Bus Station": BusStation,
-    "ORS WalkingArea 25min": walkingArea,
-    "ORS CyclingArea 25min": cyclingArea
+    "ORS WalkingArea": walkingArea,
+    "ORS CyclingArea": cyclingArea
 };
 
 L.control.layers(baseMaps, overlays).addTo(mymap);
