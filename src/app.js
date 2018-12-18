@@ -403,7 +403,7 @@ let getCyclingAreaFromORS = () => {
             }
             addBufferPolygon(envelope);
             calculated_buffer_length = calculated_buffer_length/1000;
-            marker.bindPopup("walking "+(time/60)+" minutes");
+            marker.bindPopup("cycling "+(time/60)+" minutes");
             cyclingArea.addLayer(marker);
         }
     });
